@@ -16,4 +16,18 @@ public class Die : MonoBehaviour {
 	void Update () {
 		
 	}
+
+
+	void OnTriggerEnter2D (Collider2D other)
+	{
+		Debug.Log("OnTriggerEnter2D Detected between this [" + gameObject.name + "] and other [" + other.gameObject.name + "]");
+
+	}
+
+
+	void OnCollisionEnter2D(Collision2D other)
+	{
+		Debug.Log("Collision2D Detected between this [" + gameObject.name + "] and other [" + other.gameObject.name + "]");
+
+	}
 }

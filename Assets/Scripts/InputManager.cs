@@ -56,7 +56,7 @@ public class InputManager : MonoBehaviour {
 			// We're dragging and not dropping
 			Drag ();
 
-		} else if (DropInput) {
+		} else if (draggingItem && DropInput) {
 
 			// we've let go of the button
 			Drop ();
@@ -78,7 +78,7 @@ public class InputManager : MonoBehaviour {
 		// did we hit an object
 		if (touches.Length > 0) {
 
-			Debug.Log ("Raycast hit!");
+			//Debug.Log ("Raycast hit!");
 
 			// get first item hit
 
@@ -101,7 +101,7 @@ public class InputManager : MonoBehaviour {
 				draggedObject.transform.localScale = new Vector3 (1.2f, 1.2f, 1.2f);
 
 
-				Debug.Log ("Hit Object: " + draggedObject.name);
+				//Debug.Log ("Hit Object: " + draggedObject.name);
 			}
 		}
 
