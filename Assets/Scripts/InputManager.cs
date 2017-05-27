@@ -85,7 +85,6 @@ public class InputManager : MonoBehaviour {
 			var hit = touches [0];
 
 			// was it not null?
-			// TODO - change this to check Die tagged object and that it's moveable
 			if (hit.transform.tag == "Die" && hit.transform.gameObject.GetComponent<Die>().isLocked == false) {
 
 				// turn flag on
@@ -93,6 +92,9 @@ public class InputManager : MonoBehaviour {
 
 				// set gameobject to drag
 				draggedObject = hit.transform.gameObject;
+
+				// deactivate colliders
+				draggedObject.GetComponent<BoxCollider2D>().enabled = false;
 
 				// preserve touch offset
 				touchOffset = (Vector2)hit.transform.position - inputPosition;
@@ -123,6 +125,9 @@ public class InputManager : MonoBehaviour {
 	{
 		// turn flag on
 		draggingItem = false;
+
+		// reactivate colliders
+		draggedObject.GetComponent<BoxCollider2D>().enabled = true;
 
 		// return the object to its size
         draggedObject.transform.localScale = new Vector3(1f,1f,1f);
