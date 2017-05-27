@@ -126,11 +126,12 @@ public class InputManager : MonoBehaviour {
 		// turn flag on
 		draggingItem = false;
 
-		// reactivate colliders
+		// reactivate collider
 		draggedObject.GetComponent<BoxCollider2D>().enabled = true;
 
 		// return the object to its size
         draggedObject.transform.localScale = new Vector3(1f,1f,1f);
+
 	}
 
 

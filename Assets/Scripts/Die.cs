@@ -5,7 +5,7 @@ using UnityEngine;
 public class Die : MonoBehaviour {
 
 	// can the die be moved?
-	public bool isLocked;
+	public bool isLocked = false;
 
 	// Use this for initialization
 	void Start () {
@@ -20,14 +20,33 @@ public class Die : MonoBehaviour {
 
 	void OnTriggerEnter2D (Collider2D other)
 	{
-		Debug.Log("OnTriggerEnter2D Detected between this [" + gameObject.name + "] and other [" + other.gameObject.name + "]");
+		Debug.Log ("OnTriggerEnter2D Detected between this [" + gameObject.name + "] and other [" + other.gameObject.name + "]");
+
+
+		// lock into the Q1 position if valid
+		if (other.tag == "Q1DropZone") {
+
+
+			// lock it
+			isLocked = true;
+
+		} else if (other.tag == "Q4DropZone") {
+
+
+			// lock it
+			//isLocked = true;
+
+		} else {
+
+
+		GameManager.instance.SnapBack(gameObject);
+
+		}
+
+
+
+
 
 	}
 
-
-	void OnCollisionEnter2D(Collision2D other)
-	{
-		Debug.Log("Collision2D Detected between this [" + gameObject.name + "] and other [" + other.gameObject.name + "]");
-
-	}
 }
