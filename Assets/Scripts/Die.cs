@@ -7,15 +7,7 @@ public class Die : MonoBehaviour {
 	// can the die be moved?
 	public bool isLocked = false;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+	public bool isValidPlacement = false;
 
 
 	void OnTriggerEnter2D (Collider2D other)
@@ -27,8 +19,12 @@ public class Die : MonoBehaviour {
 		if (other.tag == "Q1DropZone") {
 
 
+			// valid drop lcoation, so turn off snap back
+			isValidPlacement = true;
+
 			// lock it
 			isLocked = true;
+
 
 		} else if (other.tag == "Q4DropZone") {
 
@@ -36,15 +32,16 @@ public class Die : MonoBehaviour {
 			// lock it
 			//isLocked = true;
 
+			isValidPlacement = true;
+
 		} else {
 
+			isValidPlacement = false;
 
-		GameManager.instance.SnapBack(gameObject);
+			// Dropped into an invalid bad object location
+			GameManager.instance.SnapBack(gameObject);
 
 		}
-
-
-
 
 
 	}

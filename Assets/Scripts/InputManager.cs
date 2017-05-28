@@ -11,6 +11,17 @@ public class InputManager : MonoBehaviour {
 
 	private Vector2 touchOffset;
 
+	private Vector2 dropPosition;
+
+
+	private Vector2 CurrentTouchPosition {
+		get {
+			Vector2 inputPos;
+			inputPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			return inputPos;
+		}
+	}
+
 	// is the object moving
 	private bool HasInput {
 		get {
@@ -22,16 +33,8 @@ public class InputManager : MonoBehaviour {
 	// is the object moving
 	private bool DropInput {
 		get {
+			dropPosition = CurrentTouchPosition;
 			return Input.GetMouseButtonUp (0);
-		}
-	}
-
-
-	private Vector2 CurrentTouchPosition {
-		get {
-			Vector2 inputPos;
-			inputPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-			return inputPos;
 		}
 	}
 
@@ -81,7 +84,6 @@ public class InputManager : MonoBehaviour {
 			//Debug.Log ("Raycast hit!");
 
 			// get first item hit
-
 			var hit = touches [0];
 
 			// was it not null?
@@ -91,7 +93,7 @@ public class InputManager : MonoBehaviour {
 				draggingItem = true;
 
 				// set gameobject to drag
-				draggedObject = hit.transform.gameObject;
+				draggedObject = hit.collider.gameObject;
 
 				// deactivate colliders
 				draggedObject.GetComponent<BoxCollider2D>().enabled = false;
@@ -127,10 +129,40 @@ public class InputManager : MonoBehaviour {
 		draggingItem = false;
 
 		// reactivate collider
-		draggedObject.GetComponent<BoxCollider2D>().enabled = true;
+		draggedObject.GetComponent<BoxCollider2D> ().enabled = true;
 
 		// return the object to its size
-        draggedObject.transform.localScale = new Vector3(1f,1f,1f);
+		draggedObject.transform.localScale = new Vector3 (1f, 1f, 1f);
+
+
+		// ray cast to see if it hit anything.
+		RaycastHit2D[] dropRay = Physics2D.RaycastAll (draggedObject.transform.position, dropPosition);
+
+		// did we hit anything?
+		if (dropRay.Length > 0) {
+
+			// first element
+			var firstHit = dropRay [0];
+
+			//firstHit = firstHit.collider.gameObject;
+
+			Debug.Log ("Drop() RayCast Hit [" + dropRay.Length + "] things.  First: " + firstHit.collider.gameObject.name);
+
+//			if (firstHit.gameObject.tag == "Backdrop") {
+//
+//    		    // Check tosnap return
+//				GameManager.instance.SnapBack(firstHit);
+//
+//			}
+
+
+		} else {
+			Debug.Log("Drop() RayCast Hit Nothing");
+		}
+
+
+
+
 
 	}
 

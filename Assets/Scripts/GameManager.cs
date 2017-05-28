@@ -107,7 +107,7 @@ public class GameManager : MonoBehaviour {
 
 			// generate random value
 			int randomResult = Random.Range(0, 6);
-			Debug.Log("Die [" + i + "] result is [" + randomResult + "]");
+			//Debug.Log("Die [" + i + "] result is [" + randomResult + "]");
 
 			// create the dice
 			GameObject tmp = Instantiate(dicePrefabs[randomResult], GameObject.FindWithTag("Field").transform) as GameObject;
@@ -132,30 +132,37 @@ public class GameManager : MonoBehaviour {
 	}
 
 
-
+	// Send the die back to its starting location
 	public void SnapBack (GameObject dieObject)
 	{
 
-		// get the starting position
+		Debug.Log("SnapBack() called for object " + dieObject.name + ". IsLocked[" + dieObject.GetComponent<Die>().isLocked + "], IsValidPlacement [" + dieObject.GetComponent<Die>().isValidPlacement + "]");
 
-		Vector2 foundDie;
 
-		if (diceDictionary.TryGetValue (dieObject.name, out foundDie)) {
+		// is the object not locked and eligble to return?
+		if (!dieObject.GetComponent<Die>().isLocked && !dieObject.GetComponent<Die>().isValidPlacement) {
 
-			Debug.Log ("Dictionary lookup successful. Lookup key: [" + dieObject.name + "]");
+			// get the starting position
 
-			Debug.Log (dieObject.name + " current pos:  " + dieObject.transform.position);
-			Debug.Log (dieObject.name + " stored pos:  " + foundDie);
+			Vector2 foundDie;
 
-			// set the object back to its start
-			dieObject.transform.position = foundDie;
+			if (diceDictionary.TryGetValue (dieObject.name, out foundDie)) {
 
-		} else {
+				//			Debug.Log ("Dictionary lookup successful. Lookup key: [" + dieObject.name + "]");
 
-			Debug.Log ("Dictionary lookup failed.  Lookup key: [" + dieObject.name + "]");
+				//			Debug.Log (dieObject.name + " current pos:  " + dieObject.transform.position);
+				//			Debug.Log (dieObject.name + " stored pos:  " + foundDie);
+
+				// set the object back to its start
+				dieObject.transform.position = foundDie;
+
+			} else {
+
+				//Debug.Log ("Dictionary lookup failed.  Lookup key: [" + dieObject.name + "]");
+
+			}
 
 		}
-
 
 	}
 
