@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
@@ -18,15 +17,16 @@ public class GameManager : MonoBehaviour {
 	// the prefab rolled dice button
 	public GameObject diceButtonPrefab;
 
+	[SerializeField] private GameObject turnNumberValue;
+	[SerializeField] private GameObject scoreNumberValue;
+	[SerializeField] private GameObject qualifierOneValue;
+	[SerializeField] private GameObject qualifierFourValue;
 
-	public GameObject turnNumberValue;
-	public GameObject scoreNumberValue;
-	public GameObject qualifierOneValue;
-	public GameObject qualifierFourValue;
+
+	// Is the game over?
+	private bool isGameOver = false;
 
 
-	// has the game begun?
-	private bool gameStarted = false;
 
 	// which turn are we on?
 	private int currentTurn = 1;
@@ -35,20 +35,14 @@ public class GameManager : MonoBehaviour {
 	private int maxTurns = 4;
 
 
-	// store the generated dice roll results
-	private List<int> rollResults = new List<int>();
-
 	private bool hasQualifierOne = false;
 	private bool hasQualifierFour = false;
-	private int scoredDiceQuantity = 0;
-
 	private int playerScore = 0;
+
 
 
 	// how many dice still remain
 	private int remainingDiceCount = 6;
-
-	// Getter for dice remaining
 	public int RemainingDiceCount {
 		get {
 			return remainingDiceCount;
@@ -80,53 +74,25 @@ public class GameManager : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
 	{
-		if (gameStarted) {
+		// update the UI
+		// >> reset score to zero
+		// >> reset qualifiers to NO
+		// >> reset turn counter to 1
+		UpdateUI();
 
-			UpdateScore();
-
-			StartNewTurn();
-		}
-
-								
+		// Roll the dice!
+		StartNewTurn();
+					
 	}
 	
-	// Update is called once per frame
-	void Update ()
-	{
-
-
-
-	}
-
-
-	// Load Scene Navigation
-	public void LoadScene (string scene)
-	{
-
-		if(scene == "Game") gameStarted = true;
-
-		SceneManager.LoadScene(scene);
-
-	}
-
 
 
 	void StartNewTurn ()
 	{
 
 		// Start of turn
-		Debug.Log("Turn " + currentTurn + "; DiceRemaining: " + RemainingDiceCount + "; Q1: " + hasQualifierOne + "; Q4: " + hasQualifierFour + "; Score: " + playerScore); 
+		Debug.Log ("Turn " + currentTurn + "; DiceRemaining: " + RemainingDiceCount + "; Q1: " + hasQualifierOne + "; Q4: " + hasQualifierFour + "; Score: " + playerScore); 
 
-
-		// get rid of tall playing dice
-		foreach (Die obj in GameObject.FindObjectsOfType<Die>()) {
-
-			Destroy(obj.gameObject);
-
-		}
-
-		// update Turn Counter
-		turnNumberValue.GetComponent<Text>().text = currentTurn.ToString();
 
 		RollDice();
 
@@ -138,7 +104,19 @@ public class GameManager : MonoBehaviour {
 	public void RollDice ()
 	{
 
-		Debug.Log("RollDice() called.  Rolling " + RemainingDiceCount);
+		UpdateUI();
+
+		//Debug.Log("RollDice() called.  Rolling " + RemainingDiceCount);
+
+		// get rid of all previous playing dice if any
+		if (GameObject.FindObjectsOfType<Die> ().Length > 0) {
+			foreach (Die obj in GameObject.FindObjectsOfType<Die>()) {
+
+				Destroy (obj.gameObject);
+
+			}
+		}
+
 
 		// Loop through remaining dice and place
 		for (int i = 0; i < RemainingDiceCount; i++) {
@@ -177,10 +155,10 @@ public class GameManager : MonoBehaviour {
 			gameObj.GetComponent<Die> ().isHighlighted = true;
 
 
-			if (gameObj.name == null && gameObj == null) {
-				Debug.Log("INVALID ENTRY");
-
-			}
+//			if (gameObj.name == null && gameObj == null) {
+//				Debug.Log("INVALID ENTRY");
+//
+//			}
 
 //			Debug.Log("ADDING:  Sizeof selectedDiceForScoring: ["+ diceDictionary.Count +"]; DIctcount: " + dictcount);
 
@@ -207,10 +185,10 @@ public class GameManager : MonoBehaviour {
 
 //		Debug.Log ("Dictcount = " + dictcount);
 
-		// Get Highlighted Die
+		// Get the dice on the board
 		Die[] gameboard = GameObject.FindObjectsOfType<Die> ();
 
-		Debug.Log("Dice kept: " + gameboard.Length);
+		Debug.Log ("Dice in play this turn: " + gameboard.Length);
 
 		// did they highlight at least one?
 		if (gameboard.Length > 0) {
@@ -227,6 +205,7 @@ public class GameManager : MonoBehaviour {
 						//Debug.Log("Found 1 Qualifier");
 
 						hasQualifierOne = true;
+
 
 						RemainingDiceCount--;
 
@@ -250,42 +229,53 @@ public class GameManager : MonoBehaviour {
 
 			}
 
+		} 
 
-			// update Score
-			EndRoundUpdate();
+		// no dice left, end the game
+		if (RemainingDiceCount <= 0) {
+
+			isGameOver = true;
 
 		}
 
 
-		// look at selected dice
-		// first 1 goes to Q
-		// first 4 goes to Q
-		// any other selected are stored and scored
-		// score is updated
-		// Turn counter incremented
-
-		// out of turns ends game
-		// final result.
-
+		// finish turn
+		EndTurnUpdate();
 
 
 	}
 
 
-
-	public void EndRoundUpdate ()
+	// Wrap up the turn
+	public void EndTurnUpdate ()
 	{
 
-		UpdateScore ();
 
-		if (currentTurn >= maxTurns) {
+		// increment to next turn
+		currentTurn++;
 
-			EndGame ();
+		// Update the UI
+		UpdateUI ();
+
+		// check if game is over
+		if (currentTurn > maxTurns) {
+
+			isGameOver = true;
+
+		} 
+
+
+		Debug.Log("EndTurnUpdate() Called.  Now turn: " + currentTurn + "; Dice Remaining: " + RemainingDiceCount + "; GameOver Status: " + isGameOver);
+
+
+		// is the game over for any reason?
+		if (isGameOver == true) {
+
+			EndGame();
 
 		} else {
-		
-			currentTurn++;
 
+			// game not over, start next round
 			StartNewTurn ();
 
 		}
@@ -293,23 +283,37 @@ public class GameManager : MonoBehaviour {
 	}
 
 
-	public void UpdateScore ()
+	public void UpdateUI ()
 	{
-		// Update the UI piece
-		scoreNumberValue.GetComponent<Text>().text = playerScore.ToString();
 
+		//Debug.Log("UpdateUI() Called");
 
-		if(hasQualifierOne) qualifierOneValue.GetComponent<Text>().text = "Yes";
-		if(hasQualifierFour) qualifierFourValue.GetComponent<Text>().text = "Yes";
+		// update Turn Counter
+		turnNumberValue.GetComponent<Text>().text = currentTurn.ToString();
+
+		// Update player score
+		scoreNumberValue.GetComponent<Text> ().text = playerScore.ToString ();
+
+		// Update for qualifier on 1
+		//Debug.Log("hasQualifierOne: " + hasQualifierOne);
+		if(hasQualifierOne == true) {
+			qualifierOneValue.GetComponent<Text> ().text = "Yes"; 
+		} else {
+			qualifierOneValue.GetComponent<Text> ().text = "No";
+		}
+
+		// Update for qualifier on 4
+		qualifierFourValue.GetComponent<Text> ().text = (hasQualifierFour == true) ? "Yes" : "No";
+
 
 	}
 
-
+	// the Game is Over
 	public void EndGame() {
 
-		gameStarted = false;
+		Debug.Log ("EndGame() Called");
 
-		LoadScene("GameOver");
+		AppController.instance.LoadScene("GameOver");
 
 	}
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class AppController : MonoBehaviour {
 
@@ -34,4 +35,16 @@ public class AppController : MonoBehaviour {
 	void Update () {
 		
 	}
+
+
+	// Load Scene Navigation
+	public void LoadScene (string scene)
+	{
+
+		SceneManager.LoadScene(scene);
+
+	}
+
+
+
 }
