@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
 
 	// Singleton
-	public static GameManager instance;
+	//public static GameManager instance;
 
 	// Store the Dice prefabs
 	public GameObject[] dicePrefabs;
@@ -27,6 +28,7 @@ public class GameManager : MonoBehaviour {
 	private bool isGameOver = false;
 
 
+	private bool isNewGame = true;
 
 	// which turn are we on?
 	private int currentTurn = 1;
@@ -37,8 +39,22 @@ public class GameManager : MonoBehaviour {
 
 	private bool hasQualifierOne = false;
 	private bool hasQualifierFour = false;
-	private int playerScore = 0;
 
+
+//	private bool scoreQualifies = false;
+//	public bool ScoreQualifies {
+//		get {
+//			return scoreQualifies;
+//		}	
+//	}
+
+
+	private int playerScore = 0;
+	public int PlayerScore {
+		get {
+			return playerScore;
+		}
+	}
 
 
 	// how many dice still remain
@@ -53,23 +69,23 @@ public class GameManager : MonoBehaviour {
 	}
 
 
-	void Awake ()
-	{
-
-		// Create Singleton
-		if (instance == null) {
-
-			instance = this;
-		} else if (instance != this) {
-
-			Destroy(gameObject);
-
-		}
-
-		DontDestroyOnLoad(instance);
-
-	}
-	
+//	void Awake ()
+//	{
+//
+//		// Create Singleton
+//		if (instance == null) {
+//
+//			instance = this;
+//		} else if (instance != this) {
+//
+//			Destroy(gameObject);
+//
+//		}
+//
+//		DontDestroyOnLoad(instance);
+//
+//	}
+//	
 
 	// Use this for initialization
 	void Start ()
@@ -78,13 +94,29 @@ public class GameManager : MonoBehaviour {
 		// >> reset score to zero
 		// >> reset qualifiers to NO
 		// >> reset turn counter to 1
-		UpdateUI();
+//		if (isNewGame) {
+//
+//			Debug.Log("Update() New Game");
 
-		// Roll the dice!
-		StartNewTurn();
+			UpdateUI();
+
+			// Roll the dice!
+			StartNewTurn();
+
+//			isNewGame = false;
+//
+//		}
 					
 	}
-	
+
+
+//	void Update ()
+//	{
+//
+//
+//
+//
+//	}
 
 
 	void StartNewTurn ()
@@ -188,7 +220,7 @@ public class GameManager : MonoBehaviour {
 		// Get the dice on the board
 		Die[] gameboard = GameObject.FindObjectsOfType<Die> ();
 
-		Debug.Log ("Dice in play this turn: " + gameboard.Length);
+		//Debug.Log ("Dice in play this turn: " + gameboard.Length);
 
 		// did they highlight at least one?
 		if (gameboard.Length > 0) {
@@ -265,7 +297,7 @@ public class GameManager : MonoBehaviour {
 		} 
 
 
-		Debug.Log("EndTurnUpdate() Called.  Now turn: " + currentTurn + "; Dice Remaining: " + RemainingDiceCount + "; GameOver Status: " + isGameOver);
+		//Debug.Log("EndTurnUpdate() Called.  Now turn: " + currentTurn + "; Dice Remaining: " + RemainingDiceCount + "; GameOver Status: " + isGameOver);
 
 
 		// is the game over for any reason?
@@ -305,16 +337,44 @@ public class GameManager : MonoBehaviour {
 		// Update for qualifier on 4
 		qualifierFourValue.GetComponent<Text> ().text = (hasQualifierFour == true) ? "Yes" : "No";
 
+		// does their score qualify
+		AppController.instance.ScoreQualifies = (hasQualifierOne == true && hasQualifierFour == true) ? true : false;
 
 	}
 
 	// the Game is Over
 	public void EndGame() {
 
+		
 		Debug.Log ("EndGame() Called");
+
+		AppController.instance.FinalScore = playerScore;
 
 		AppController.instance.LoadScene("GameOver");
 
+
 	}
+
+
+
+	public void ResetGameVars ()
+	{
+
+		Debug.Log ("ResetGameVars() Called");
+
+		// which turn are we on?
+		currentTurn = 1;
+		hasQualifierOne = false;
+		hasQualifierFour = false;
+		AppController.instance.ScoreQualifies = false;
+		playerScore = 0;
+		remainingDiceCount = 6;
+
+		// major reset indicator
+		isNewGame = true;
+
+	}
+
+
 
 }

@@ -9,6 +9,29 @@ public class AppController : MonoBehaviour {
 	public static AppController instance;
 
 
+	private bool scoreQualifies = false;
+	public bool ScoreQualifies {
+		get {
+			return scoreQualifies;
+		}	
+		set {
+			scoreQualifies = value;
+		}
+	}
+
+
+	// final player score
+	private int finalScore = 0;
+	public int FinalScore {
+		get {
+			return finalScore;
+		}
+		set {
+			finalScore = value;
+		}
+	}
+
+
 	void Awake ()
 	{
 
