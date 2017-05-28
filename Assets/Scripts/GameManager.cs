@@ -2,29 +2,47 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 
+	// Singleton
 	public static GameManager instance;
 
 	// Store the Dice prefabs
 	public GameObject[] dicePrefabs;
 
+	// Store the faces of the dice to show the values
+	public Sprite[] diceSpriteArray;
+
+	// the prefab rolled dice button
+	public GameObject diceButtonPrefab;
+
+
+	public GameObject turnNumberValue;
+	public GameObject scoreNumberValue;
+	public GameObject qualifierOneValue;
+	public GameObject qualifierFourValue;
+
+
 	// has the game begun?
-	private bool gameStarted = true;
+	private bool gameStarted = false;
 
 	// which turn are we on?
-	private int currentTurn = 0;
+	private int currentTurn = 1;
+
+	// how many throws?
+	private int maxTurns = 4;
+
 
 	// store the generated dice roll results
 	private List<int> rollResults = new List<int>();
 
-	// store the generated dice roll results for snapbacks
-	private List<GameObject> diceStartingPositions = new List<GameObject>();
+	private bool hasQualifierOne = false;
+	private bool hasQualifierFour = false;
+	private int scoredDiceQuantity = 0;
 
-
-
-	private Dictionary<string, Vector2> diceDictionary = new Dictionary<string, Vector2>();
+	private int playerScore = 0;
 
 
 	// how many dice still remain
@@ -44,7 +62,7 @@ public class GameManager : MonoBehaviour {
 	void Awake ()
 	{
 
-
+		// Create Singleton
 		if (instance == null) {
 
 			instance = this;
@@ -63,32 +81,56 @@ public class GameManager : MonoBehaviour {
 	void Start ()
 	{
 		if (gameStarted) {
-			RollDice();
+
+			UpdateScore();
+
+			StartNewTurn();
 		}
-					
+
+								
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		
+	void Update ()
+	{
+
+
+
 	}
 
 
+	// Load Scene Navigation
 	public void LoadScene (string scene)
 	{
-		gameStarted = true;
-		SceneManager.LoadScene("Game");
 
+		if(scene == "Game") gameStarted = true;
+
+		SceneManager.LoadScene(scene);
 
 	}
 
 
-	public void SubmitTurn ()
+
+	void StartNewTurn ()
 	{
-		Debug.Log("Submitted Turn");
+
+		// Start of turn
+		Debug.Log("Turn " + currentTurn + "; DiceRemaining: " + RemainingDiceCount + "; Q1: " + hasQualifierOne + "; Q4: " + hasQualifierFour + "; Score: " + playerScore); 
+
+
+		// get rid of tall playing dice
+		foreach (Die obj in GameObject.FindObjectsOfType<Die>()) {
+
+			Destroy(obj.gameObject);
+
+		}
+
+		// update Turn Counter
+		turnNumberValue.GetComponent<Text>().text = currentTurn.ToString();
+
+		RollDice();
 
 	}
-
 
 
 
@@ -96,11 +138,7 @@ public class GameManager : MonoBehaviour {
 	public void RollDice ()
 	{
 
-		// how many dice to roll?
-		// roll and generate results
-
-		// Clear the starting positions of dice
-		diceStartingPositions.Clear();
+		Debug.Log("RollDice() called.  Rolling " + RemainingDiceCount);
 
 		// Loop through remaining dice and place
 		for (int i = 0; i < RemainingDiceCount; i++) {
@@ -110,62 +148,169 @@ public class GameManager : MonoBehaviour {
 			//Debug.Log("Die [" + i + "] result is [" + randomResult + "]");
 
 			// create the dice
-			GameObject tmp = Instantiate(dicePrefabs[randomResult], GameObject.FindWithTag("Field").transform) as GameObject;
-			tmp.name = "DieCast" + i;
+			GameObject tmp = Instantiate(diceButtonPrefab, GameObject.FindWithTag("Field").transform) as GameObject;
 
-			// generate X offset
-			float xPos = i - ( (remainingDiceCount/2) - 0.5f);
-		
-			// place the dice
-			tmp.transform.position = new Vector2(xPos,0f);
+			// rename the gameObjects
+			tmp.name = "DieCastButton_" + i;
 
-			// store the position for snap backs
-			diceStartingPositions.Add(tmp);
+			// assign die value
+			tmp.GetComponent<Die>().dieValue = randomResult + 1;
 
-			// add dice name and position
-			diceDictionary.Add(tmp.name, tmp.transform.position);
-
+			// Update the image to show the matching face.
+			tmp.GetComponent<Image>().sprite = diceSpriteArray[randomResult];
 
 		}
 
-
 	}
 
-
-	// Send the die back to its starting location
-	public void SnapBack (GameObject dieObject)
+	// Toggle to keep or re-roll
+	public void SelectDie (GameObject gameObj)
 	{
 
-		Debug.Log("SnapBack() called for object " + dieObject.name + ". IsLocked[" + dieObject.GetComponent<Die>().isLocked + "], IsValidPlacement [" + dieObject.GetComponent<Die>().isValidPlacement + "]");
+		//Debug.Log ("SelectDie() called.");
 
 
-		// is the object not locked and eligble to return?
-		if (!dieObject.GetComponent<Die>().isLocked && !dieObject.GetComponent<Die>().isValidPlacement) {
+		// If not highlighted, then...
+		if (gameObj.GetComponent<Die> ().isHighlighted == false) {
 
-			// get the starting position
+			// set highlight flag
+			gameObj.GetComponent<Die> ().isHighlighted = true;
 
-			Vector2 foundDie;
 
-			if (diceDictionary.TryGetValue (dieObject.name, out foundDie)) {
-
-				//			Debug.Log ("Dictionary lookup successful. Lookup key: [" + dieObject.name + "]");
-
-				//			Debug.Log (dieObject.name + " current pos:  " + dieObject.transform.position);
-				//			Debug.Log (dieObject.name + " stored pos:  " + foundDie);
-
-				// set the object back to its start
-				dieObject.transform.position = foundDie;
-
-			} else {
-
-				//Debug.Log ("Dictionary lookup failed.  Lookup key: [" + dieObject.name + "]");
+			if (gameObj.name == null && gameObj == null) {
+				Debug.Log("INVALID ENTRY");
 
 			}
 
+//			Debug.Log("ADDING:  Sizeof selectedDiceForScoring: ["+ diceDictionary.Count +"]; DIctcount: " + dictcount);
+
+			// turn it yellow.
+			gameObj.GetComponent<Image> ().color = Color.yellow;
+
+
+		} else if (gameObj.GetComponent<Die> ().isHighlighted == true) {
+
+			// remove highlight flag
+			gameObj.GetComponent<Die> ().isHighlighted = false;
+
+			// turn it back to white.
+			gameObj.GetComponent<Image> ().color = Color.white;
+
+//			Debug.Log("REMOVING:  Sizeof selectedDiceForScoring: ["+ diceDictionary.Count +"]; DIctcount: " + dictcount);
+		}
+	}
+
+
+	// Process Turn
+	public void SubmitTurn ()
+	{
+
+//		Debug.Log ("Dictcount = " + dictcount);
+
+		// Get Highlighted Die
+		Die[] gameboard = GameObject.FindObjectsOfType<Die> ();
+
+		Debug.Log("Dice kept: " + gameboard.Length);
+
+		// did they highlight at least one?
+		if (gameboard.Length > 0) {
+
+			// loop through
+			foreach (Die gob in gameboard) {
+
+				// if its highlighted, count it.
+				if (gob.isHighlighted) {
+
+
+					if (gob.dieValue == 1 && hasQualifierOne == false) {
+
+						//Debug.Log("Found 1 Qualifier");
+
+						hasQualifierOne = true;
+
+						RemainingDiceCount--;
+
+					} else if (gob.dieValue == 4 && hasQualifierFour == false) {
+
+						//Debug.Log("Found 4 Qualifier");
+
+						hasQualifierFour = true;
+
+						RemainingDiceCount--;
+
+					} else {
+
+						playerScore += gob.dieValue;
+
+						RemainingDiceCount--;
+
+					}
+
+				}
+
+			}
+
+
+			// update Score
+			EndRoundUpdate();
+
+		}
+
+
+		// look at selected dice
+		// first 1 goes to Q
+		// first 4 goes to Q
+		// any other selected are stored and scored
+		// score is updated
+		// Turn counter incremented
+
+		// out of turns ends game
+		// final result.
+
+
+
+	}
+
+
+
+	public void EndRoundUpdate ()
+	{
+
+		UpdateScore ();
+
+		if (currentTurn >= maxTurns) {
+
+			EndGame ();
+
+		} else {
+		
+			currentTurn++;
+
+			StartNewTurn ();
+
 		}
 
 	}
 
 
+	public void UpdateScore ()
+	{
+		// Update the UI piece
+		scoreNumberValue.GetComponent<Text>().text = playerScore.ToString();
+
+
+		if(hasQualifierOne) qualifierOneValue.GetComponent<Text>().text = "Yes";
+		if(hasQualifierFour) qualifierFourValue.GetComponent<Text>().text = "Yes";
+
+	}
+
+
+	public void EndGame() {
+
+		gameStarted = false;
+
+		LoadScene("GameOver");
+
+	}
 
 }
