@@ -8,6 +8,7 @@ Library/
 Assets/AssetStoreTools*
 _APK/
 _AppStoreAssets/
+Assets/_Ignore
 
 # ===================================== #
 # Visual Studio / MonoDevelop generated #

@@ -9,6 +9,25 @@ public class AppController : MonoBehaviour {
 	public static AppController instance;
 
 
+	private bool isSoundOn = true;
+	public bool IsSoundOn {
+		get {
+			if (PlayerPrefs.HasKey ("Sound")) {
+
+				return (PlayerPrefs.GetInt ("Sound") == 1) ? true : false;
+
+			} else {
+				// if they do not have it, return local var
+				return true;
+			}
+		}
+		set {
+			PrefsSetSound(value);
+		}
+
+
+	}
+
 	private bool scoreQualifies = false;
 	public bool ScoreQualifies {
 		get {
@@ -30,6 +49,9 @@ public class AppController : MonoBehaviour {
 			finalScore = value;
 		}
 	}
+
+
+
 
 
 	void Awake ()
@@ -69,5 +91,22 @@ public class AppController : MonoBehaviour {
 	}
 
 
+	public void PrefsSetSound(bool newValue)
+	{
+		// convert bool to int
+		int tmp = (newValue == true) ? 1 : 0;
+
+		// Set the value
+		PlayerPrefs.SetInt ("Sound", tmp);
+
+	}
+
+
+
+
+
 
 }
+
+
+

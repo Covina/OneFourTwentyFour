@@ -34,12 +34,20 @@ public class GameManager : MonoBehaviour {
 	private int currentTurn = 1;
 
 	// how many throws?
-	private int maxTurns = 4;
+	private int maxTurns = 6;
+
+	private int turnDieSelectedCount = 0;
 
 
 	private bool hasQualifierOne = false;
 	private bool hasQualifierFour = false;
 
+	// Green color
+	//private Color buttonActiveColor = new Color(67f,184f,38f,1);
+	private Color buttonActiveColor = Color.green;
+
+	// Gray color
+	private Color buttonDisabledColor = Color.gray;
 
 //	private bool scoreQualifies = false;
 //	public bool ScoreQualifies {
@@ -106,7 +114,10 @@ public class GameManager : MonoBehaviour {
 //			isNewGame = false;
 //
 //		}
-					
+
+		GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonDisabledColor;
+
+														
 	}
 
 
@@ -186,6 +197,7 @@ public class GameManager : MonoBehaviour {
 			// set highlight flag
 			gameObj.GetComponent<Die> ().isHighlighted = true;
 
+			turnDieSelectedCount++;
 
 //			if (gameObj.name == null && gameObj == null) {
 //				Debug.Log("INVALID ENTRY");
@@ -206,7 +218,20 @@ public class GameManager : MonoBehaviour {
 			// turn it back to white.
 			gameObj.GetComponent<Image> ().color = Color.white;
 
+			turnDieSelectedCount--;
+
 //			Debug.Log("REMOVING:  Sizeof selectedDiceForScoring: ["+ diceDictionary.Count +"]; DIctcount: " + dictcount);
+		}
+
+		// Did they at least select one die
+		if (turnDieSelectedCount > 0) {
+			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonActiveColor;
+
+			Debug.Log("selected die count > 0, changing color to " + buttonActiveColor);
+		} else {
+			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonDisabledColor;
+
+			Debug.Log("selected die count == 0, changing color to Color.gray");
 		}
 	}
 
@@ -321,14 +346,14 @@ public class GameManager : MonoBehaviour {
 		//Debug.Log("UpdateUI() Called");
 
 		// update Turn Counter
-		turnNumberValue.GetComponent<Text>().text = currentTurn.ToString();
+		turnNumberValue.GetComponent<Text> ().text = currentTurn.ToString ();
 
 		// Update player score
 		scoreNumberValue.GetComponent<Text> ().text = playerScore.ToString ();
 
 		// Update for qualifier on 1
 		//Debug.Log("hasQualifierOne: " + hasQualifierOne);
-		if(hasQualifierOne == true) {
+		if (hasQualifierOne == true) {
 			qualifierOneValue.GetComponent<Text> ().text = "Yes"; 
 		} else {
 			qualifierOneValue.GetComponent<Text> ().text = "No";
@@ -336,6 +361,7 @@ public class GameManager : MonoBehaviour {
 
 		// Update for qualifier on 4
 		qualifierFourValue.GetComponent<Text> ().text = (hasQualifierFour == true) ? "Yes" : "No";
+
 
 		// does their score qualify
 		AppController.instance.ScoreQualifies = (hasQualifierOne == true && hasQualifierFour == true) ? true : false;
