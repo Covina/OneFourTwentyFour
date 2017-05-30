@@ -44,7 +44,7 @@ public class GameManager : MonoBehaviour {
 
 	// Green color
 	//private Color buttonActiveColor = new Color(67f,184f,38f,1);
-	private Color buttonActiveColor = Color.green;
+	private Color buttonActiveColor = Color.white;
 
 	// Gray color
 	private Color buttonDisabledColor = Color.gray;
@@ -137,6 +137,10 @@ public class GameManager : MonoBehaviour {
 		Debug.Log ("Turn " + currentTurn + "; DiceRemaining: " + RemainingDiceCount + "; Q1: " + hasQualifierOne + "; Q4: " + hasQualifierFour + "; Score: " + playerScore); 
 
 
+		turnDieSelectedCount = 0;
+
+		UpdateSubmitButton ();
+
 		RollDice();
 
 	}
@@ -197,6 +201,7 @@ public class GameManager : MonoBehaviour {
 			// set highlight flag
 			gameObj.GetComponent<Die> ().isHighlighted = true;
 
+			// add one to turn die keep counter
 			turnDieSelectedCount++;
 
 //			if (gameObj.name == null && gameObj == null) {
@@ -223,18 +228,32 @@ public class GameManager : MonoBehaviour {
 //			Debug.Log("REMOVING:  Sizeof selectedDiceForScoring: ["+ diceDictionary.Count +"]; DIctcount: " + dictcount);
 		}
 
-		// Did they at least select one die
-		if (turnDieSelectedCount > 0) {
-			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonActiveColor;
+		UpdateSubmitButton ();
 
-			Debug.Log("selected die count > 0, changing color to " + buttonActiveColor);
-		} else {
-			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonDisabledColor;
-
-			Debug.Log("selected die count == 0, changing color to Color.gray");
-		}
 	}
 
+
+	// Check whether to enable or disable the submit button
+	void UpdateSubmitButton ()
+	{
+		// Did they at least select one die
+		if (turnDieSelectedCount > 0) {
+			// change to Active Color
+			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonActiveColor;
+			// add the clicky bit
+			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().enabled = true;
+			//Debug.Log("selected die count > 0, changing color to " + buttonActiveColor);
+		}
+		else {
+			// change to Active Color
+			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonDisabledColor;
+			// remove the clicky bit
+			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().enabled = false;
+			//Debug.Log("selected die count == 0, changing color to Color.gray");
+		}
+
+		Debug.Log("UpdateSubmitButton() Called.  turnDieSelectedCount [" + turnDieSelectedCount + "]");
+	}
 
 	// Process Turn
 	public void SubmitTurn ()
@@ -307,6 +326,7 @@ public class GameManager : MonoBehaviour {
 	public void EndTurnUpdate ()
 	{
 
+		Debug.Log("EndTurnUpdate() Called.  turnDieSelectedCount [" + turnDieSelectedCount + "]");
 
 		// increment to next turn
 		currentTurn++;
@@ -337,6 +357,8 @@ public class GameManager : MonoBehaviour {
 
 		}
 
+
+
 	}
 
 
@@ -353,11 +375,14 @@ public class GameManager : MonoBehaviour {
 
 		// Update for qualifier on 1
 		//Debug.Log("hasQualifierOne: " + hasQualifierOne);
-		if (hasQualifierOne == true) {
-			qualifierOneValue.GetComponent<Text> ().text = "Yes"; 
-		} else {
-			qualifierOneValue.GetComponent<Text> ().text = "No";
-		}
+//		if (hasQualifierOne == true) {
+//			qualifierOneValue.GetComponent<Text> ().text = "Yes"; 
+//		} else {
+//			qualifierOneValue.GetComponent<Text> ().text = "No";
+//		}
+
+		// Update for qualifier on 1
+		qualifierOneValue.GetComponent<Text> ().text = (hasQualifierOne == true) ? "Yes" : "No";	
 
 		// Update for qualifier on 4
 		qualifierFourValue.GetComponent<Text> ().text = (hasQualifierFour == true) ? "Yes" : "No";
@@ -395,6 +420,7 @@ public class GameManager : MonoBehaviour {
 		AppController.instance.ScoreQualifies = false;
 		playerScore = 0;
 		remainingDiceCount = 6;
+		turnDieSelectedCount = 0;
 
 		// major reset indicator
 		isNewGame = true;
