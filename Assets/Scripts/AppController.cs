@@ -51,7 +51,15 @@ public class AppController : MonoBehaviour {
 	}
 
 
-
+	private bool isNewGame = true;
+	public bool IsNewGame {
+		get {
+			return isNewGame;
+		}
+		set {
+			isNewGame = value;
+		}
+	}
 
 
 	void Awake ()
@@ -70,17 +78,6 @@ public class AppController : MonoBehaviour {
 		DontDestroyOnLoad(instance);
 
 	}
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
 
 	// Load Scene Navigation
 	public void LoadScene (string scene)

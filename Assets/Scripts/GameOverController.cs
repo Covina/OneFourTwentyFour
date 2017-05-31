@@ -15,10 +15,16 @@ public class GameOverController : MonoBehaviour {
 		// update final score
 
 		if (AppController.instance.ScoreQualifies) {
+
 			finalScoreValue.GetComponent<Text> ().text = AppController.instance.FinalScore.ToString ();
+
 		} else {
 			finalScoreValue.GetComponent<Text> ().text = "Score Disqualified";
 		}
+
+
+		// reset to new game
+		AppController.instance.IsNewGame = true;
 
 	}
 
@@ -26,8 +32,7 @@ public class GameOverController : MonoBehaviour {
 	public void RestartGame ()
 	{
 
-		//GameManager.instance.ResetGameVars();
-
+		// reload the game scene
 		AppController.instance.LoadScene("Game");
 
 	}

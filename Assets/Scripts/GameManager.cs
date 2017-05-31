@@ -6,9 +6,6 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
 
-	// Singleton
-	//public static GameManager instance;
-
 	// Store the Dice prefabs
 	public GameObject[] dicePrefabs;
 
@@ -27,42 +24,27 @@ public class GameManager : MonoBehaviour {
 	// Is the game over?
 	private bool isGameOver = false;
 
-
-	private bool isNewGame = true;
-
 	// which turn are we on?
 	private int currentTurn = 1;
 
 	// how many throws?
 	private int maxTurns = 6;
 
+	// how many dice did the player select on this turn
 	private int turnDieSelectedCount = 0;
 
-
+	// Track our qualifiers
 	private bool hasQualifierOne = false;
 	private bool hasQualifierFour = false;
 
-	// Green color
-	//private Color buttonActiveColor = new Color(67f,184f,38f,1);
+	// Active color
 	private Color buttonActiveColor = Color.white;
 
-	// Gray color
+	// Disabled color
 	private Color buttonDisabledColor = Color.gray;
 
-//	private bool scoreQualifies = false;
-//	public bool ScoreQualifies {
-//		get {
-//			return scoreQualifies;
-//		}	
-//	}
-
-
+	// store player score during the game
 	private int playerScore = 0;
-	public int PlayerScore {
-		get {
-			return playerScore;
-		}
-	}
 
 
 	// how many dice still remain
@@ -76,84 +58,40 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-
-//	void Awake ()
-//	{
-//
-//		// Create Singleton
-//		if (instance == null) {
-//
-//			instance = this;
-//		} else if (instance != this) {
-//
-//			Destroy(gameObject);
-//
-//		}
-//
-//		DontDestroyOnLoad(instance);
-//
-//	}
-//	
-
 	// Use this for initialization
 	void Start ()
 	{
-		// update the UI
-		// >> reset score to zero
-		// >> reset qualifiers to NO
-		// >> reset turn counter to 1
-//		if (isNewGame) {
-//
-//			Debug.Log("Update() New Game");
 
-			UpdateUI();
+		// if its a brand new game, make sure we reset all values
+		if (AppController.instance.IsNewGame) {
 
-			// Roll the dice!
-			StartNewTurn();
+			ResetGameVars();
 
-//			isNewGame = false;
-//
-//		}
+			// game is in session!
+			AppController.instance.IsNewGame = false;
 
-		GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonDisabledColor;
+		}
 
+		// Update the UI
+		UpdateGameUI();
+
+		// Roll the dice!
+		StartNewTurn();
 														
 	}
 
 
-//	void Update ()
-//	{
-//
-//
-//
-//
-//	}
-
-
+	// Start the turn
 	void StartNewTurn ()
 	{
 
-		// Start of turn
-		Debug.Log ("Turn " + currentTurn + "; DiceRemaining: " + RemainingDiceCount + "; Q1: " + hasQualifierOne + "; Q4: " + hasQualifierFour + "; Score: " + playerScore); 
+		//Debug.Log ("Turn " + currentTurn + "; DiceRemaining: " + RemainingDiceCount + "; Q1: " + hasQualifierOne + "; Q4: " + hasQualifierFour + "; Score: " + playerScore); 
 
-
+		// this turn's selected count
 		turnDieSelectedCount = 0;
 
-		UpdateSubmitButton ();
-
-		RollDice();
-
-	}
-
-
-
-	// dice rolling
-	public void RollDice ()
-	{
-
-		UpdateUI();
-
-		//Debug.Log("RollDice() called.  Rolling " + RemainingDiceCount);
+		// Update our UI
+		UpdateGameUI();
 
 		// get rid of all previous playing dice if any
 		if (GameObject.FindObjectsOfType<Die> ().Length > 0) {
@@ -188,6 +126,7 @@ public class GameManager : MonoBehaviour {
 
 	}
 
+
 	// Toggle to keep or re-roll
 	public void SelectDie (GameObject gameObj)
 	{
@@ -204,10 +143,6 @@ public class GameManager : MonoBehaviour {
 			// add one to turn die keep counter
 			turnDieSelectedCount++;
 
-//			if (gameObj.name == null && gameObj == null) {
-//				Debug.Log("INVALID ENTRY");
-//
-//			}
 
 //			Debug.Log("ADDING:  Sizeof selectedDiceForScoring: ["+ diceDictionary.Count +"]; DIctcount: " + dictcount);
 
@@ -228,32 +163,10 @@ public class GameManager : MonoBehaviour {
 //			Debug.Log("REMOVING:  Sizeof selectedDiceForScoring: ["+ diceDictionary.Count +"]; DIctcount: " + dictcount);
 		}
 
-		UpdateSubmitButton ();
+		UpdateGameUI ();
 
 	}
 
-
-	// Check whether to enable or disable the submit button
-	void UpdateSubmitButton ()
-	{
-		// Did they at least select one die
-		if (turnDieSelectedCount > 0) {
-			// change to Active Color
-			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonActiveColor;
-			// add the clicky bit
-			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().enabled = true;
-			//Debug.Log("selected die count > 0, changing color to " + buttonActiveColor);
-		}
-		else {
-			// change to Active Color
-			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonDisabledColor;
-			// remove the clicky bit
-			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().enabled = false;
-			//Debug.Log("selected die count == 0, changing color to Color.gray");
-		}
-
-		Debug.Log("UpdateSubmitButton() Called.  turnDieSelectedCount [" + turnDieSelectedCount + "]");
-	}
 
 	// Process Turn
 	public void SubmitTurn ()
@@ -283,29 +196,34 @@ public class GameManager : MonoBehaviour {
 						hasQualifierOne = true;
 
 
-						RemainingDiceCount--;
-
 					} else if (gob.dieValue == 4 && hasQualifierFour == false) {
 
 						//Debug.Log("Found 4 Qualifier");
 
 						hasQualifierFour = true;
 
-						RemainingDiceCount--;
-
 					} else {
 
 						playerScore += gob.dieValue;
 
-						RemainingDiceCount--;
+
 
 					}
+
+					// remove die from pool
+					RemainingDiceCount--;
 
 				}
 
 			}
 
 		} 
+
+		// Have they qualified?
+		if (hasQualifierOne == true && hasQualifierFour == true) {
+			// score has qualified
+			AppController.instance.ScoreQualifies = true;
+		}
 
 		// no dice left, end the game
 		if (RemainingDiceCount <= 0) {
@@ -314,40 +232,16 @@ public class GameManager : MonoBehaviour {
 
 		}
 
-
-		// finish turn
-		EndTurnUpdate();
-
-
-	}
-
-
-	// Wrap up the turn
-	public void EndTurnUpdate ()
-	{
-
-		Debug.Log("EndTurnUpdate() Called.  turnDieSelectedCount [" + turnDieSelectedCount + "]");
-
 		// increment to next turn
 		currentTurn++;
 
 		// Update the UI
-		UpdateUI ();
+		//UpdateGameUI ();
 
 		// check if game is over
-		if (currentTurn > maxTurns) {
+		if (currentTurn > maxTurns || isGameOver == true) {
 
 			isGameOver = true;
-
-		} 
-
-
-		//Debug.Log("EndTurnUpdate() Called.  Now turn: " + currentTurn + "; Dice Remaining: " + RemainingDiceCount + "; GameOver Status: " + isGameOver);
-
-
-		// is the game over for any reason?
-		if (isGameOver == true) {
-
 			EndGame();
 
 		} else {
@@ -358,28 +252,20 @@ public class GameManager : MonoBehaviour {
 		}
 
 
-
 	}
 
 
-	public void UpdateUI ()
+	// Update all the visual indicators
+	public void UpdateGameUI ()
 	{
 
 		//Debug.Log("UpdateUI() Called");
 
 		// update Turn Counter
-		turnNumberValue.GetComponent<Text> ().text = currentTurn.ToString ();
+		//turnNumberValue.GetComponent<Text> ().text = currentTurn.ToString ();
 
 		// Update player score
 		scoreNumberValue.GetComponent<Text> ().text = playerScore.ToString ();
-
-		// Update for qualifier on 1
-		//Debug.Log("hasQualifierOne: " + hasQualifierOne);
-//		if (hasQualifierOne == true) {
-//			qualifierOneValue.GetComponent<Text> ().text = "Yes"; 
-//		} else {
-//			qualifierOneValue.GetComponent<Text> ().text = "No";
-//		}
 
 		// Update for qualifier on 1
 		qualifierOneValue.GetComponent<Text> ().text = (hasQualifierOne == true) ? "Yes" : "No";	
@@ -387,9 +273,32 @@ public class GameManager : MonoBehaviour {
 		// Update for qualifier on 4
 		qualifierFourValue.GetComponent<Text> ().text = (hasQualifierFour == true) ? "Yes" : "No";
 
+		// Did they at least select one die
+		if (turnDieSelectedCount > 0) {
 
-		// does their score qualify
-		AppController.instance.ScoreQualifies = (hasQualifierOne == true && hasQualifierFour == true) ? true : false;
+			// update text
+			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponentInChildren<Text>().text = "Keep";
+
+			// change to Active Color
+			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonActiveColor;
+
+			// add the clicky bit
+			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().enabled = true;
+			//Debug.Log("selected die count > 0, changing color to " + buttonActiveColor);
+		}
+		else {
+
+			// update text
+			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponentInChildren<Text>().text = "Select Dice";
+
+			// change to Active Color
+			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonDisabledColor;
+
+			// remove the clicky bit
+			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().enabled = false;
+			//Debug.Log("selected die count == 0, changing color to Color.gray");
+		}
+
 
 	}
 
@@ -397,21 +306,23 @@ public class GameManager : MonoBehaviour {
 	public void EndGame() {
 
 		
-		Debug.Log ("EndGame() Called");
+		//Debug.Log ("EndGame() Called");
 
+		// Store the final score of the player
 		AppController.instance.FinalScore = playerScore;
 
+		// Advance to the Game Over scene
 		AppController.instance.LoadScene("GameOver");
 
 
 	}
 
 
-
+	// Reset all the vars to clear the way for a new game
 	public void ResetGameVars ()
 	{
 
-		Debug.Log ("ResetGameVars() Called");
+		//Debug.Log ("ResetGameVars() Called");
 
 		// which turn are we on?
 		currentTurn = 1;
@@ -423,7 +334,7 @@ public class GameManager : MonoBehaviour {
 		turnDieSelectedCount = 0;
 
 		// major reset indicator
-		isNewGame = true;
+		AppController.instance.IsNewGame = true;
 
 	}
 
