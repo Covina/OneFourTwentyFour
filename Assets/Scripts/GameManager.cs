@@ -15,26 +15,35 @@ public class GameManager : MonoBehaviour {
 	// the prefab rolled dice button
 	public GameObject diceButtonPrefab;
 
-	[SerializeField] private GameObject AIController;
+	//[SerializeField] private GameObject AIController;
 
 	//[SerializeField] private GameObject turnNumberValue;
 	[SerializeField] private GameObject scoreNumberValue;
 	private List<int> playerRollResults = new List<int>();
 
 	// Opponent 1
+	private GameObject opp1MasterObject;
 	[SerializeField] private GameObject opp1ScoreNumberValue;
 	[SerializeField] private GameObject opp1QualifierOneValue;
 	[SerializeField] private GameObject opp1QualifierFourValue;
+	private bool opp1FilledQ1 = false;
+	private bool opp1FilledQ4 = false;
 
 	// Opponent 2
+	private GameObject opp2MasterObject;
 	[SerializeField] private GameObject opp2ScoreNumberValue;
 	[SerializeField] private GameObject opp2QualifierOneValue;
 	[SerializeField] private GameObject opp2QualifierFourValue;
+	private bool opp2FilledQ1 = false;
+	private bool opp2FilledQ4 = false;
 
 	// Opponent 3
+	private GameObject opp3MasterObject;
 	[SerializeField] private GameObject opp3ScoreNumberValue;
 	[SerializeField] private GameObject opp3QualifierOneValue;
 	[SerializeField] private GameObject opp3QualifierFourValue;
+	private bool opp3FilledQ1 = false;
+	private bool opp3FilledQ4 = false;
 
 
 	// Is the game over?
@@ -45,6 +54,9 @@ public class GameManager : MonoBehaviour {
 
 	// how many throws?
 	private int maxTurns = 6;
+
+
+	private int playerUsedDice = 0;
 
 	// how many dice did the player select on this turn
 	private int turnDieSelectedCount = 0;
@@ -74,6 +86,20 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+
+	// AI Players
+	private ComputerAIController ai1 = new ComputerAIController();
+	List<int> ai1Results = new List<int>();
+
+	private ComputerAIController ai2 = new ComputerAIController();
+	List<int> ai2Results = new List<int>();
+
+	private ComputerAIController ai3 = new ComputerAIController();
+	List<int> ai3Results = new List<int>();
+
+
+
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -96,20 +122,22 @@ public class GameManager : MonoBehaviour {
 
 
 
-		// dump AI
-		ComputerAIController ai1 = new ComputerAIController();
+		// Computer Player 1
+		opp1MasterObject = GameObject.FindWithTag("CPU1");
 		ai1.SetDifficulty(0);
-		List<int> ai1Results = ai1.ReturnResult();
+		ai1Results = ai1.ReturnResult();
 		ai1.PrintResults();
 
-		ComputerAIController ai2 = new ComputerAIController();
+		// Computer Player 2
+		opp2MasterObject = GameObject.FindWithTag("CPU2");
 		ai2.SetDifficulty(0);
-		List<int> ai2Results = ai2.ReturnResult();
+		ai2Results = ai2.ReturnResult();
 		ai2.PrintResults();
 
-		ComputerAIController ai3 = new ComputerAIController();
+		// Computer Player 3
+		opp3MasterObject = GameObject.FindWithTag("CPU3");
 		ai3.SetDifficulty(0);
-		List<int> ai3Results = ai3.ReturnResult();
+		ai3Results = ai3.ReturnResult();
 		ai3.PrintResults();
 
 																																																		
@@ -266,10 +294,15 @@ public class GameManager : MonoBehaviour {
 					}
 
 					// remove die from pool
-					RemainingDiceCount--;
+					remainingDiceCount--;
 
-					// track results storing
-					Debug.Log("Current stored die count: " + playerRollResults.Count);
+					// incremenet used die
+					playerUsedDice++;
+
+//					// track results storing
+//					Debug.Log("Player has Used total dice amount: " + playerUsedDice);
+//					Debug.Log("Player has Scored total dice amount: " + playerRollResults.Count);
+//					Debug.Log("Player has Remaining dice amount: " + remainingDiceCount);
 
 				}
 
@@ -292,6 +325,15 @@ public class GameManager : MonoBehaviour {
 
 		// increment to next turn
 		currentTurn++;
+
+
+
+		// track results storing
+		Debug.Log("Player has Used total dice amount: " + playerUsedDice);
+		Debug.Log("Player has Scored total dice amount: " + playerRollResults.Count);
+		Debug.Log("Player has Remaining dice amount: " + remainingDiceCount);
+
+
 
 		// check if game is over
 		if (currentTurn > maxTurns || isGameOver == true) {
@@ -322,13 +364,13 @@ public class GameManager : MonoBehaviour {
 		scoreNumberValue.GetComponent<Text> ().text = playerScore.ToString ();
 
 		// check button toggle
-		UpdateSubmitButtonDisplay();
+		UpdateSubmitButtonDisplay ();
 
 		// Do they have the One qualifier
 		if (hasQualifierOne == true) {
 
 			// Turn off the text image
-			GameObject.Find("OneTextAlpha").SetActive(false);
+			GameObject.Find ("OneTextAlpha").SetActive (false);
 
 			// Update the Sprite from Green to Dice
 			GameObject.FindGameObjectWithTag ("PlayerQ1").GetComponent<Image> ().sprite = diceSpriteArray [0];
@@ -338,7 +380,7 @@ public class GameManager : MonoBehaviour {
 		if (hasQualifierFour == true) {
 
 			// Turn off the text image
-			GameObject.Find("FourTextAlpha").SetActive(false);
+			GameObject.Find ("FourTextAlpha").SetActive (false);
 
 			// Update the Sprite from Green to Dice
 			GameObject.FindGameObjectWithTag ("PlayerQ4").GetComponent<Image> ().sprite = diceSpriteArray [3];
@@ -352,12 +394,112 @@ public class GameManager : MonoBehaviour {
 		foreach (int dieKeptValue in playerRollResults) {
 
 			// Update the playing field with the die iamges
-			GameObject.Find("PlayerD" + dieCounter).GetComponent<Image>().sprite = diceSpriteArray [dieKeptValue - 1];
+			GameObject.Find ("PlayerD" + dieCounter).GetComponent<Image> ().sprite = diceSpriteArray [dieKeptValue - 1];
 
 			dieCounter++;
 		}
 
 
+
+
+
+		// AI UI UPDATE =====================
+
+		// use player dice count to determine how many to show of 
+		// fill in scored dice
+		// fill in qualifiers
+		// update score value
+
+
+		// ==================================
+
+
+		int displayAIDiceCount = 6 - remainingDiceCount;
+
+		Debug.Log ("AI to display dice amount: " + displayAIDiceCount);
+
+		if (displayAIDiceCount > 0) {
+
+			// CPU OPPONENT #1
+
+			// RESET / INIT VARS ===================
+			int[] a1array = ai1Results.ToArray ();
+
+			// Which Dice Scoring Position are we filling
+			int scoreDicePosition = 1;
+
+			opp1FilledQ1 = false;
+			opp1FilledQ4 = false;
+
+			// **************************************
+
+
+			// Update results for Computer Player 1
+			for (int i = 0; i < displayAIDiceCount; i++) {
+
+				// convenience:  store the face value of the die
+				int diceFaceValue = a1array [i];
+
+				// convenience: make the by-name lookup easier
+				string scoreBoxLookup = "D" + scoreDicePosition;
+
+
+				Debug.Log("CPU Display ForLoop;  Processing iteration i[" + i + "] against displayAIDiceCount [" + displayAIDiceCount + "];  Showing CPU Die Face Value [" + diceFaceValue + "];  scoreBoxLookup: " + scoreBoxLookup);
+
+
+
+				// Was it a 1 and we havent yet qualified?  Then fill it Qualifier ONE
+				if (diceFaceValue == 1 && opp1FilledQ1 == false) {
+
+					opp1QualifierOneValue.GetComponent<Image> ().sprite = diceSpriteArray [0];
+					opp1QualifierOneValue.transform.Find ("OneTextAlpha").GetComponent<Image> ().enabled = false;
+					opp1FilledQ1 = true;
+
+					// end loop iteration
+					continue;
+				}
+
+				// Was it a 1 and we havent yet qualified?  Then fill it Qualifier Four
+				if (diceFaceValue == 4 && opp1FilledQ1 == false) {
+
+					// display qualifier Four
+					opp1QualifierFourValue.GetComponent<Image> ().sprite = diceSpriteArray [3];
+					opp1QualifierFourValue.transform.Find ("FourTextAlpha").GetComponent<Image> ().enabled = false;
+					opp1FilledQ4 = true;
+
+					// end loop iteration
+					continue;
+				}
+
+
+
+				//Debug.Log ("Current ScoreBox for Opp1: " + scoreBoxLookup);
+
+				// We acn only hold 4 Scored spots, so ignore any updates past that
+				if (scoreDicePosition <= 4) {
+					// put it into one of the scoring boxes
+					opp1MasterObject.transform.Find ("DiceContainer").transform.Find (scoreBoxLookup).GetComponent<Image> ().sprite = diceSpriteArray [diceFaceValue - 1];
+				}
+
+
+				// move to next scoring box
+				scoreDicePosition++;
+
+			}
+
+			// Update results for Computer Player 2
+
+
+			// Update results for Computer Player 3
+
+
+
+
+		} // end AI update
+
+
+
+		Debug.Log("================================");
 
 	}
 
@@ -389,6 +531,17 @@ public class GameManager : MonoBehaviour {
 
 		// major reset indicator
 		AppController.instance.IsNewGame = true;
+
+
+		// Reset AI Vars
+		opp1FilledQ1 = false;
+		opp1FilledQ4 = false;
+
+		opp2FilledQ1 = false;
+		opp2FilledQ4 = false;
+
+		opp3FilledQ1 = false;
+		opp3FilledQ4 = false;
 
 	}
 
