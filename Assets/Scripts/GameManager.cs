@@ -20,6 +20,22 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] private GameObject qualifierOneValue;
 	[SerializeField] private GameObject qualifierFourValue;
 
+	// Opponent 1
+	[SerializeField] private GameObject opp1ScoreNumberValue;
+	[SerializeField] private GameObject opp1QualifierOneValue;
+	[SerializeField] private GameObject opp1QualifierFourValue;
+
+
+	// Opponent 2
+	[SerializeField] private GameObject opp2ScoreNumberValue;
+	[SerializeField] private GameObject opp2QualifierOneValue;
+	[SerializeField] private GameObject opp2QualifierFourValue;
+
+	// Opponent 3
+	[SerializeField] private GameObject opp3ScoreNumberValue;
+	[SerializeField] private GameObject opp3QualifierOneValue;
+	[SerializeField] private GameObject opp3QualifierFourValue;
+
 
 	// Is the game over?
 	private bool isGameOver = false;
