@@ -17,14 +17,14 @@ public class GameManager : MonoBehaviour {
 
 	[SerializeField] private GameObject turnNumberValue;
 	[SerializeField] private GameObject scoreNumberValue;
-	[SerializeField] private GameObject qualifierOneValue;
-	[SerializeField] private GameObject qualifierFourValue;
+	//[SerializeField] private GameObject qualifierOneValue;
+	//[SerializeField] private GameObject qualifierFourValue;
+	private List<int> playerRollResults = new List<int>();
 
 	// Opponent 1
 	[SerializeField] private GameObject opp1ScoreNumberValue;
 	[SerializeField] private GameObject opp1QualifierOneValue;
 	[SerializeField] private GameObject opp1QualifierFourValue;
-
 
 	// Opponent 2
 	[SerializeField] private GameObject opp2ScoreNumberValue;
@@ -179,7 +179,35 @@ public class GameManager : MonoBehaviour {
 //			Debug.Log("REMOVING:  Sizeof selectedDiceForScoring: ["+ diceDictionary.Count +"]; DIctcount: " + dictcount);
 		}
 
-		UpdateGameUI ();
+
+		// Did they at least select one die
+		if (turnDieSelectedCount > 0) {
+
+			// update text
+			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponentInChildren<Text>().text = "Keep";
+
+			// change to Active Color
+			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonActiveColor;
+
+			// add the clicky bit
+			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().enabled = true;
+			//Debug.Log("selected die count > 0, changing color to " + buttonActiveColor);
+		}
+		else {
+
+			// update text
+			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponentInChildren<Text>().text = "Select Dice";
+
+			// change to Active Color
+			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonDisabledColor;
+
+			// remove the clicky bit
+			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().enabled = false;
+			//Debug.Log("selected die count == 0, changing color to Color.gray");
+		}
+
+
+		//UpdateGameUI ();
 
 	}
 
@@ -223,11 +251,16 @@ public class GameManager : MonoBehaviour {
 						playerScore += gob.dieValue;
 
 
-
 					}
 
 					// remove die from pool
 					RemainingDiceCount--;
+
+					// store the player results
+					playerRollResults.Add(gob.dieValue);
+
+					// track results storing
+					Debug.Log("Current stored die count: " + playerRollResults.Count);
 
 				}
 
@@ -281,39 +314,75 @@ public class GameManager : MonoBehaviour {
 		//turnNumberValue.GetComponent<Text> ().text = currentTurn.ToString ();
 
 		// Update player score
-		scoreNumberValue.GetComponent<Text> ().text = playerScore.ToString ();
+		//scoreNumberValue.GetComponent<Text> ().text = playerScore.ToString ();
 
-		// Update for qualifier on 1
-		qualifierOneValue.GetComponent<Text> ().text = (hasQualifierOne == true) ? "Yes" : "No";	
+		// Loop through current results and update the UI
 
-		// Update for qualifier on 4
-		qualifierFourValue.GetComponent<Text> ().text = (hasQualifierFour == true) ? "Yes" : "No";
+		// Player 1 dice field
+		int dieCounter = 1;
+		foreach (int dieKeptValue in playerRollResults) {
 
-		// Did they at least select one die
-		if (turnDieSelectedCount > 0) {
+			// if die is 1 or 4 and not already qualified, use it as qualifer
+			if (dieKeptValue == 1 && hasQualifierOne == false) {
 
-			// update text
-			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponentInChildren<Text>().text = "Keep";
+				// set to true
+				hasQualifierOne = true;
 
-			// change to Active Color
-			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonActiveColor;
+				// Turn off the text
+				GameObject.FindGameObjectWithTag ("PlayerQ1").GetComponentInChildren<Text> ().enabled = false;
 
-			// add the clicky bit
-			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().enabled = true;
-			//Debug.Log("selected die count > 0, changing color to " + buttonActiveColor);
+				// Update the Sprite from Green to Dice
+				GameObject.FindGameObjectWithTag ("PlayerQ1").GetComponent<Image> ().sprite = diceSpriteArray [0];
+
+			} else if (dieKeptValue == 4 && hasQualifierFour == false) {
+
+				// set to true
+				hasQualifierFour = true;
+
+				// Turn off the text
+				GameObject.FindGameObjectWithTag ("PlayerQ4").GetComponentInChildren<Text> ().enabled = false;
+
+				// Update the Sprite from Green to Dice
+				GameObject.FindGameObjectWithTag ("PlayerQ4").GetComponent<Image> ().sprite = diceSpriteArray [0];
+
+			} else {
+
+				// Update the playing field with the die iamges
+				GameObject.Find("PlayerD" + dieCounter).GetComponent<Image>().sprite = diceSpriteArray [dieKeptValue - 1];
+
+
+			}
+
+			// increment to go to next position
+			dieCounter++;		
+
 		}
-		else {
 
-			// update text
-			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponentInChildren<Text>().text = "Select Dice";
-
-			// change to Active Color
-			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonDisabledColor;
-
-			// remove the clicky bit
-			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().enabled = false;
-			//Debug.Log("selected die count == 0, changing color to Color.gray");
-		}
+//		// Did they at least select one die
+//		if (turnDieSelectedCount > 0) {
+//
+//			// update text
+//			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponentInChildren<Text>().text = "Keep";
+//
+//			// change to Active Color
+//			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonActiveColor;
+//
+//			// add the clicky bit
+//			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().enabled = true;
+//			//Debug.Log("selected die count > 0, changing color to " + buttonActiveColor);
+//		}
+//		else {
+//
+//			// update text
+//			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponentInChildren<Text>().text = "Select Dice";
+//
+//			// change to Active Color
+//			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonDisabledColor;
+//
+//			// remove the clicky bit
+//			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().enabled = false;
+//			//Debug.Log("selected die count == 0, changing color to Color.gray");
+//		}
 
 
 	}
