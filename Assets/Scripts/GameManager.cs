@@ -106,6 +106,7 @@ public class GameManager : MonoBehaviour {
 		// this turn's selected count
 		turnDieSelectedCount = 0;
 
+
 		// Update our UI
 		UpdateGameUI();
 
@@ -145,9 +146,8 @@ public class GameManager : MonoBehaviour {
 
 	// Toggle to keep or re-roll
 	public void SelectDie (GameObject gameObj)
-	{
+	{	//Debug.Log ("SelectDie() called.");
 
-		//Debug.Log ("SelectDie() called.");
 
 
 		// If not highlighted, then...
@@ -158,9 +158,6 @@ public class GameManager : MonoBehaviour {
 
 			// add one to turn die keep counter
 			turnDieSelectedCount++;
-
-
-//			Debug.Log("ADDING:  Sizeof selectedDiceForScoring: ["+ diceDictionary.Count +"]; DIctcount: " + dictcount);
 
 			// turn it yellow.
 			gameObj.GetComponent<Image> ().color = Color.yellow;
@@ -176,10 +173,15 @@ public class GameManager : MonoBehaviour {
 
 			turnDieSelectedCount--;
 
-//			Debug.Log("REMOVING:  Sizeof selectedDiceForScoring: ["+ diceDictionary.Count +"]; DIctcount: " + dictcount);
 		}
 
+		// Update button
+		UpdateSubmitButtonDisplay();
 
+	}
+
+	public void UpdateSubmitButtonDisplay()
+	{
 		// Did they at least select one die
 		if (turnDieSelectedCount > 0) {
 
@@ -207,8 +209,6 @@ public class GameManager : MonoBehaviour {
 		}
 
 
-		//UpdateGameUI ();
-
 	}
 
 
@@ -216,12 +216,8 @@ public class GameManager : MonoBehaviour {
 	public void SubmitTurn ()
 	{
 
-//		Debug.Log ("Dictcount = " + dictcount);
-
 		// Get the dice on the board
 		Die[] gameboard = GameObject.FindObjectsOfType<Die> ();
-
-		//Debug.Log ("Dice in play this turn: " + gameboard.Length);
 
 		// did they highlight at least one?
 		if (gameboard.Length > 0) {
@@ -235,14 +231,10 @@ public class GameManager : MonoBehaviour {
 
 					if (gob.dieValue == 1 && hasQualifierOne == false) {
 
-						//Debug.Log("Found 1 Qualifier");
-
 						hasQualifierOne = true;
 
 
 					} else if (gob.dieValue == 4 && hasQualifierFour == false) {
-
-						//Debug.Log("Found 4 Qualifier");
 
 						hasQualifierFour = true;
 
@@ -250,14 +242,13 @@ public class GameManager : MonoBehaviour {
 
 						playerScore += gob.dieValue;
 
+						// store the player results
+						playerRollResults.Add(gob.dieValue);
 
 					}
 
 					// remove die from pool
 					RemainingDiceCount--;
-
-					// store the player results
-					playerRollResults.Add(gob.dieValue);
 
 					// track results storing
 					Debug.Log("Current stored die count: " + playerRollResults.Count);
@@ -284,9 +275,6 @@ public class GameManager : MonoBehaviour {
 		// increment to next turn
 		currentTurn++;
 
-		// Update the UI
-		//UpdateGameUI ();
-
 		// check if game is over
 		if (currentTurn > maxTurns || isGameOver == true) {
 
@@ -306,92 +294,59 @@ public class GameManager : MonoBehaviour {
 
 	// Update all the visual indicators
 	public void UpdateGameUI ()
-	{
+	{	//Debug.Log("UpdateUI() Called");
 
-		//Debug.Log("UpdateUI() Called");
+		
 
 		// update Turn Counter
 		//turnNumberValue.GetComponent<Text> ().text = currentTurn.ToString ();
 
 		// Update player score
-		//scoreNumberValue.GetComponent<Text> ().text = playerScore.ToString ();
+		scoreNumberValue.GetComponent<Text> ().text = playerScore.ToString ();
+
+		// check button toggle
+		UpdateSubmitButtonDisplay();
+
+		// Do they have the One qualifier
+		if (hasQualifierOne == true) {
+
+			// Turn off the text image
+			GameObject.Find("OneTextAlpha").SetActive(false);
+
+			// Update the Sprite from Green to Dice
+			GameObject.FindGameObjectWithTag ("PlayerQ1").GetComponent<Image> ().sprite = diceSpriteArray [0];
+		}
+
+		// Do they have the Four qualifier
+		if (hasQualifierFour == true) {
+
+			// Turn off the text image
+			GameObject.Find("FourTextAlpha").SetActive(false);
+
+			// Update the Sprite from Green to Dice
+			GameObject.FindGameObjectWithTag ("PlayerQ4").GetComponent<Image> ().sprite = diceSpriteArray [3];
+
+		} 
 
 		// Loop through current results and update the UI
 
-		// Player 1 dice field
+		// Player 1 Scored Dice
 		int dieCounter = 1;
 		foreach (int dieKeptValue in playerRollResults) {
 
-			// if die is 1 or 4 and not already qualified, use it as qualifer
-			if (dieKeptValue == 1 && hasQualifierOne == false) {
+			// Update the playing field with the die iamges
+			GameObject.Find("PlayerD" + dieCounter).GetComponent<Image>().sprite = diceSpriteArray [dieKeptValue - 1];
 
-				// set to true
-				hasQualifierOne = true;
-
-				// Turn off the text
-				GameObject.FindGameObjectWithTag ("PlayerQ1").GetComponentInChildren<Text> ().enabled = false;
-
-				// Update the Sprite from Green to Dice
-				GameObject.FindGameObjectWithTag ("PlayerQ1").GetComponent<Image> ().sprite = diceSpriteArray [0];
-
-			} else if (dieKeptValue == 4 && hasQualifierFour == false) {
-
-				// set to true
-				hasQualifierFour = true;
-
-				// Turn off the text
-				GameObject.FindGameObjectWithTag ("PlayerQ4").GetComponentInChildren<Text> ().enabled = false;
-
-				// Update the Sprite from Green to Dice
-				GameObject.FindGameObjectWithTag ("PlayerQ4").GetComponent<Image> ().sprite = diceSpriteArray [0];
-
-			} else {
-
-				// Update the playing field with the die iamges
-				GameObject.Find("PlayerD" + dieCounter).GetComponent<Image>().sprite = diceSpriteArray [dieKeptValue - 1];
-
-
-			}
-
-			// increment to go to next position
-			dieCounter++;		
-
+			dieCounter++;
 		}
 
-//		// Did they at least select one die
-//		if (turnDieSelectedCount > 0) {
-//
-//			// update text
-//			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponentInChildren<Text>().text = "Keep";
-//
-//			// change to Active Color
-//			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonActiveColor;
-//
-//			// add the clicky bit
-//			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().enabled = true;
-//			//Debug.Log("selected die count > 0, changing color to " + buttonActiveColor);
-//		}
-//		else {
-//
-//			// update text
-//			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponentInChildren<Text>().text = "Select Dice";
-//
-//			// change to Active Color
-//			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().image.color = buttonDisabledColor;
-//
-//			// remove the clicky bit
-//			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().enabled = false;
-//			//Debug.Log("selected die count == 0, changing color to Color.gray");
-//		}
 
 
 	}
 
 	// the Game is Over
-	public void EndGame() {
-
-		
-		//Debug.Log ("EndGame() Called");
+	public void EndGame() 
+	{	//Debug.Log ("EndGame() Called");
 
 		// Store the final score of the player
 		AppController.instance.FinalScore = playerScore;
@@ -399,15 +354,12 @@ public class GameManager : MonoBehaviour {
 		// Advance to the Game Over scene
 		AppController.instance.LoadScene("GameOver");
 
-
 	}
 
 
 	// Reset all the vars to clear the way for a new game
 	public void ResetGameVars ()
-	{
-
-		//Debug.Log ("ResetGameVars() Called");
+	{	//Debug.Log ("ResetGameVars() Called");
 
 		// which turn are we on?
 		currentTurn = 1;
