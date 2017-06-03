@@ -15,10 +15,10 @@ public class GameManager : MonoBehaviour {
 	// the prefab rolled dice button
 	public GameObject diceButtonPrefab;
 
-	[SerializeField] private GameObject turnNumberValue;
+	[SerializeField] private GameObject AIController;
+
+	//[SerializeField] private GameObject turnNumberValue;
 	[SerializeField] private GameObject scoreNumberValue;
-	//[SerializeField] private GameObject qualifierOneValue;
-	//[SerializeField] private GameObject qualifierFourValue;
 	private List<int> playerRollResults = new List<int>();
 
 	// Opponent 1
@@ -93,7 +93,26 @@ public class GameManager : MonoBehaviour {
 
 		// Roll the dice!
 		StartNewTurn();
-														
+
+
+
+		// dump AI
+		ComputerAIController ai1 = new ComputerAIController();
+		ai1.SetDifficulty(0);
+		List<int> ai1Results = ai1.ReturnResult();
+		ai1.PrintResults();
+
+		ComputerAIController ai2 = new ComputerAIController();
+		ai2.SetDifficulty(0);
+		List<int> ai2Results = ai2.ReturnResult();
+		ai2.PrintResults();
+
+		ComputerAIController ai3 = new ComputerAIController();
+		ai3.SetDifficulty(0);
+		List<int> ai3Results = ai3.ReturnResult();
+		ai3.PrintResults();
+
+																																																		
 	}
 
 
