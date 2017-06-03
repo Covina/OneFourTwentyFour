@@ -106,7 +106,6 @@ public class GameManager : MonoBehaviour {
 		// this turn's selected count
 		turnDieSelectedCount = 0;
 
-
 		// Update our UI
 		UpdateGameUI();
 
@@ -297,7 +296,6 @@ public class GameManager : MonoBehaviour {
 	{	//Debug.Log("UpdateUI() Called");
 
 		
-
 		// update Turn Counter
 		//turnNumberValue.GetComponent<Text> ().text = currentTurn.ToString ();
 
