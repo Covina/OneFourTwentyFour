@@ -8,7 +8,7 @@ public class AppController : MonoBehaviour {
 	// Singleton
 	public static AppController instance;
 
-
+	// Sound On/Off
 	private bool isSoundOn = true;
 	public bool IsSoundOn {
 		get {
@@ -28,6 +28,7 @@ public class AppController : MonoBehaviour {
 
 	}
 
+	// Does the player's score qualify
 	private bool scoreQualifies = false;
 	public bool ScoreQualifies {
 		get {
@@ -50,7 +51,7 @@ public class AppController : MonoBehaviour {
 		}
 	}
 
-
+	// is this a new game starting?
 	private bool isNewGame = true;
 	public bool IsNewGame {
 		get {
@@ -88,6 +89,7 @@ public class AppController : MonoBehaviour {
 	}
 
 
+	// Store the Sounds Setting in PlayerPrefs
 	public void PrefsSetSound(bool newValue)
 	{
 		// convert bool to int
