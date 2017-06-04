@@ -360,14 +360,13 @@ public class ComputerAIController {
 	}
 
 
-
 	public void PrintResults()
 	{
 		string aiGameResultsString = "";
 		foreach (int val in AIGameResults) {
 			aiGameResultsString += val + ", ";
 		}
-		Debug.Log ("AIGameResults Values:[" + aiGameResultsString + "]; Qualified [" + isScoreQualified + "];  Score [" + aiScore + "]");
+		//Debug.Log ("AIGameResults Values:[" + aiGameResultsString + "]; Qualified [" + isScoreQualified + "];  Score [" + aiScore + "]");
 
 	}
 

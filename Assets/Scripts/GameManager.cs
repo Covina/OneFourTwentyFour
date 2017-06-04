@@ -90,13 +90,15 @@ public class GameManager : MonoBehaviour {
 	}
 
 
-	// AI Players
+	// AI Player 1
 	private ComputerAIController ai1 = new ComputerAIController();
 	List<int> ai1Results = new List<int>();
 
+	// AI Player 2
 	private ComputerAIController ai2 = new ComputerAIController();
 	List<int> ai2Results = new List<int>();
 
+	// AI Player 3
 	private ComputerAIController ai3 = new ComputerAIController();
 	List<int> ai3Results = new List<int>();
 
@@ -121,7 +123,7 @@ public class GameManager : MonoBehaviour {
 		// Start the turn
 		StartNewTurn();
 
-		// Computer Player 1
+		// Generate Computer Player 1
 		opp1MasterObject = GameObject.FindWithTag("CPU1");
 		ai1.SetDifficulty(0);
 		ai1Results = ai1.ReturnResult();
@@ -129,7 +131,7 @@ public class GameManager : MonoBehaviour {
 		AppController.instance.CPU1FinalScore = ai1.AIScore;
 		ai1.PrintResults();
 
-		// Computer Player 2
+		// Generate Computer Player 2
 		opp2MasterObject = GameObject.FindWithTag("CPU2");
 		ai2.SetDifficulty(1);
 		ai2Results = ai2.ReturnResult();
@@ -137,7 +139,7 @@ public class GameManager : MonoBehaviour {
 		AppController.instance.CPU2FinalScore = ai2.AIScore;
 		ai2.PrintResults();
 
-		// Computer Player 3
+		// Generate Computer Player 3
 		opp3MasterObject = GameObject.FindWithTag("CPU3");
 		ai3.SetDifficulty(2);
 		ai3Results = ai3.ReturnResult();
@@ -169,11 +171,13 @@ public class GameManager : MonoBehaviour {
 
 		// get rid of all previous playing dice if any
 		if (GameObject.FindObjectsOfType<Die> ().Length > 0) {
+
 			foreach (Die obj in GameObject.FindObjectsOfType<Die>()) {
 
 				Destroy (obj.gameObject);
 
 			}
+
 		}
 
 
@@ -380,25 +384,26 @@ public class GameManager : MonoBehaviour {
 
 		// Player 1 Scored Dice
 		int dieCounter = 1;
-		foreach (int dieKeptValue in playerRollResults) {
+		if (playerRollResults.Count > 0) {
+			foreach (int dieKeptValue in playerRollResults) {
 
-			string playerScorePositionTag = "PlayerD" + dieCounter;
+				string playerScorePositionTag = "PlayerD" + dieCounter;
 
-			// player score cant qualify, end game
-			if (dieCounter >= 5 && playerHasQualifierOne == false && playerHasQualifierFour == false) {
+				// player score cant qualify, end game
+				if (dieCounter >= 5 && playerHasQualifierOne == false && playerHasQualifierFour == false) {
 
-				// end game
-				EndGame();
+					// end game
+					EndGame ();
 
-			} else {
-				// Update the playing field with the die iamges
-				GameObject.FindGameObjectWithTag (playerScorePositionTag).GetComponent<Image> ().sprite = diceSpriteArray [dieKeptValue - 1];
+				} else {
+					// Update the playing field with the die iamges
+					GameObject.FindGameObjectWithTag (playerScorePositionTag).GetComponent<Image> ().sprite = diceSpriteArray [dieKeptValue - 1];
+				}
+
+				dieCounter++;
+
 			}
-
-			dieCounter++;
-
 		}
-
 	}
 
 
@@ -409,7 +414,7 @@ public class GameManager : MonoBehaviour {
 		// derive how many CPU results to show
 		int cpuDiceToDisplay = 6 - remainingDiceCount;
 
-		Debug.Log ("AI to display dice amount: " + cpuDiceToDisplay);
+		//Debug.Log ("AI to display dice amount: " + cpuDiceToDisplay);
 
 		// if its more than zero, show CPU results
 		if (cpuDiceToDisplay > 0) {
