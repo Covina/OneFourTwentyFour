@@ -14,9 +14,9 @@ public class GameOverController : MonoBehaviour {
 
 		// update final score
 
-		if (AppController.instance.ScoreQualifies) {
+		if (AppController.instance.PlayerScoreQualifies) {
 
-			finalScoreValue.GetComponent<Text> ().text = AppController.instance.FinalScore.ToString ();
+			finalScoreValue.GetComponent<Text> ().text = AppController.instance.PlayerFinalScore.ToString ();
 
 		} else {
 			finalScoreValue.GetComponent<Text> ().text = "Score Disqualified";

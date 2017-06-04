@@ -29,25 +29,95 @@ public class AppController : MonoBehaviour {
 	}
 
 	// Does the player's score qualify
-	private bool scoreQualifies = false;
-	public bool ScoreQualifies {
+	private bool playerScoreQualifies = false;
+	public bool PlayerScoreQualifies {
 		get {
-			return scoreQualifies;
+			return playerScoreQualifies;
 		}	
 		set {
-			scoreQualifies = value;
+			playerScoreQualifies = value;
 		}
 	}
 
 
 	// final player score
-	private int finalScore = 0;
-	public int FinalScore {
+	private int playerFinalScore = 0;
+	public int PlayerFinalScore {
 		get {
-			return finalScore;
+			return playerFinalScore;
 		}
 		set {
-			finalScore = value;
+			playerFinalScore = value;
+		}
+	}
+
+	// Does CPU1 score qualify
+	private bool cpu1ScoreQualifies = false;
+	public bool CPU1ScoreQualifies {
+		get {
+			return cpu1ScoreQualifies;
+		}	
+		set {
+			cpu1ScoreQualifies = value;
+		}
+	}
+
+
+	// Final CPU1 score
+	private int cpu1FinalScore = 0;
+	public int CPU1FinalScore {
+		get {
+			return cpu1FinalScore;
+		}
+		set {
+			cpu1FinalScore = value;
+		}
+	}
+
+
+	// Does CPU2 score qualify
+	private bool cpu2ScoreQualifies = false;
+	public bool CPU2ScoreQualifies {
+		get {
+			return cpu2ScoreQualifies;
+		}	
+		set {
+			cpu2ScoreQualifies = value;
+		}
+	}
+
+
+	// Final CPU1 score
+	private int cpu2FinalScore = 0;
+	public int CPU2FinalScore {
+		get {
+			return cpu2FinalScore;
+		}
+		set {
+			cpu2FinalScore = value;
+		}
+	}
+
+	// Does CPU1 score qualify
+	private bool cpu3ScoreQualifies = false;
+	public bool CPU3ScoreQualifies {
+		get {
+			return cpu3ScoreQualifies;
+		}	
+		set {
+			cpu3ScoreQualifies = value;
+		}
+	}
+
+
+	// Final CPU1 score
+	private int cpu3FinalScore = 0;
+	public int CPU3FinalScore {
+		get {
+			return cpu3FinalScore;
+		}
+		set {
+			cpu3FinalScore = value;
 		}
 	}
 

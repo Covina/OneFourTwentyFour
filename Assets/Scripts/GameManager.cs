@@ -125,18 +125,24 @@ public class GameManager : MonoBehaviour {
 		opp1MasterObject = GameObject.FindWithTag("CPU1");
 		ai1.SetDifficulty(0);
 		ai1Results = ai1.ReturnResult();
+		AppController.instance.CPU1ScoreQualifies = ai1.IsScoreQualified;
+		AppController.instance.CPU1FinalScore = ai1.AIScore;
 		ai1.PrintResults();
 
 		// Computer Player 2
 		opp2MasterObject = GameObject.FindWithTag("CPU2");
 		ai2.SetDifficulty(1);
 		ai2Results = ai2.ReturnResult();
+		AppController.instance.CPU2ScoreQualifies = ai2.IsScoreQualified;
+		AppController.instance.CPU2FinalScore = ai2.AIScore;
 		ai2.PrintResults();
 
 		// Computer Player 3
 		opp3MasterObject = GameObject.FindWithTag("CPU3");
 		ai3.SetDifficulty(2);
 		ai3Results = ai3.ReturnResult();
+		AppController.instance.CPU3ScoreQualifies = ai3.IsScoreQualified;
+		AppController.instance.CPU3FinalScore = ai3.AIScore;
 		ai3.PrintResults();
 
 
@@ -312,7 +318,7 @@ public class GameManager : MonoBehaviour {
 		// Have they qualified?
 		if (playerHasQualifierOne == true && playerHasQualifierFour == true) {
 			// score has qualified
-			AppController.instance.ScoreQualifies = true;
+			AppController.instance.PlayerScoreQualifies = true;
 		}
 
 		// no dice left, end the game
@@ -628,7 +634,7 @@ public class GameManager : MonoBehaviour {
 	{	//Debug.Log ("EndGame() Called");
 
 		// Store the final score of the player
-		AppController.instance.FinalScore = playerScore;
+		AppController.instance.PlayerFinalScore = playerScore;
 
 		// Advance to the Game Over scene
 		AppController.instance.LoadScene("GameOver");
@@ -644,7 +650,7 @@ public class GameManager : MonoBehaviour {
 		currentTurn = 1;
 		playerHasQualifierOne = false;
 		playerHasQualifierFour = false;
-		AppController.instance.ScoreQualifies = false;
+		AppController.instance.PlayerScoreQualifies = false;
 		playerScore = 0;
 		remainingDiceCount = 6;
 		turnDieSelectedCount = 0;

@@ -155,6 +155,7 @@ public class ComputerAIController {
 
 					// store it
 					AIGameResults.Add (keeperDie);
+					aiScore += keeperDie;
 
 					// reduce dice
 					diceRemaining--;
@@ -300,6 +301,8 @@ public class ComputerAIController {
 						optionsCountSix--;
 						diceRemaining--;
 						pickedThisTurn++;
+
+						aiScore += 6;
 					}
 
 
@@ -312,6 +315,8 @@ public class ComputerAIController {
 						diceRemaining--;
 						pickedThisTurn++;
 
+						aiScore += highValue;
+
 					}
 
 				}
@@ -322,6 +327,7 @@ public class ComputerAIController {
 
 
 		} // end while loop
+
 
 		// does the score qualify?
 		if (hasQualifierOne && hasQualifierFour) {
@@ -361,7 +367,7 @@ public class ComputerAIController {
 		foreach (int val in AIGameResults) {
 			aiGameResultsString += val + ", ";
 		}
-		Debug.Log ("AIGameResults Values: " + aiGameResultsString + ";  Qualified?[" + isScoreQualified + "];  Score [" + aiScore + "]");
+		Debug.Log ("AIGameResults Values:[" + aiGameResultsString + "]; Qualified [" + isScoreQualified + "];  Score [" + aiScore + "]");
 
 	}
 
