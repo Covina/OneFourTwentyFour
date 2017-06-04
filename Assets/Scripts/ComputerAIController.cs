@@ -69,7 +69,6 @@ public class ComputerAIController {
 	public List<int> ReturnResult ()
 	{
 
-
 		// INITIALIZE VARIABLES ==========================
 
 		// Fresh list of rolledDice
@@ -79,38 +78,101 @@ public class ComputerAIController {
 		int keeperDie = 0;
 
 		bool thisOneKept = false;
-		// ================================================ 
+
+//		int turnCounter = 1;
+
+		// Loop through the turns until we run out of dice.
+		while (diceRemaining > 0) {
+
+			// Rolling Dice
+			rolledDieOptions = RollDice (diceRemaining);
+
+			// set to zero
+			keeperDie = 0;
 
 
-
-		// EASY DIFFICULTY
-		if (difficulty == 0) {
-
-			int turnCounter = 1;
-
-			// Loop through the turns until we run out of dice.
-			while (diceRemaining > 0) {
-
-
-				//Debug.Log("WHILE LOOP() Top;  Dice Remaining: " + diceRemaining);
-
-				// Rolling Dice
-				rolledDieOptions = RollDice (diceRemaining);
-
-				// set to zero
-				keeperDie = 0;
-
+			// EASY DIFFICULTY
+			// Likely to keep qualifiers when seen, adds random die 
+			if (difficulty == 0) {
 
 				// Look through dice
 				foreach (int dieValue in rolledDieOptions) {
 
-					// RESET VARIABLES =============================
-
 					// track if we already kept this value if it was a qualifying 1 or 4
 					thisOneKept = false;
 
-					// =============================================
+					// always keep the first 1 seen if needed to qualify
+					if (dieValue == 1 && hasQualifierOne == false) {
 
+
+						// Choose to save a ONE for qualification be a 50/50 shot
+
+						if (Random.Range (0, 2) > 0) {
+
+							// keep the die
+							AIGameResults.Add (dieValue);
+
+							// flip to true
+							hasQualifierOne = true;
+
+							// reduce remaining die count
+							diceRemaining--;
+
+							thisOneKept = true;
+						}
+
+
+					}
+
+					// always keep the first 4 seen if needed to qualify
+					if (dieValue == 4 && hasQualifierFour == false) {
+
+						// Choose to save a FOUR for qualification be a 66% shot
+
+						if (Random.Range (0, 3) == 0) {
+
+							// keep the die
+							AIGameResults.Add (dieValue);
+
+							// flip to true
+							hasQualifierFour = true;
+
+							// reduce remaining die count
+							diceRemaining--;
+
+							thisOneKept = true;
+						}
+					}
+
+				} // end FOR loop
+
+
+				// Keeps a random dice if qualifier picked.
+				if (thisOneKept == false) {
+
+					// get the random die value
+					keeperDie = rolledDieOptions [Random.Range (0, rolledDieOptions.Count)];
+
+					// store it
+					AIGameResults.Add (keeperDie);
+
+					// reduce dice
+					diceRemaining--;
+
+				}
+
+			}
+
+
+
+			// MEDIUM DIFFICULTY
+			if (difficulty == 1) {
+
+				// Look through dice
+				foreach (int dieValue in rolledDieOptions) {
+
+					// track if we already kept this value if it was a qualifying 1 or 4
+					thisOneKept = false;
 
 					// always keep the first 1 seen if needed to qualify
 					if (dieValue == 1 && hasQualifierOne == false) {
@@ -125,9 +187,6 @@ public class ComputerAIController {
 						diceRemaining--;
 
 						thisOneKept = true;
-
-						// decision made on this die, move to next value
-						//continue;
 
 					}
 
@@ -145,11 +204,7 @@ public class ComputerAIController {
 
 						thisOneKept = true;
 
-						// decision made on this die, move to next value
-						//continue;
-
 					}
-
 
 					// Always keep the highest non-qualifier die on each turn no matter what
 					if (dieValue > keeperDie && thisOneKept == false) {
@@ -159,7 +214,6 @@ public class ComputerAIController {
 						keeperDie = dieValue;
 						//Debug.Log("Keeper die now value: " + keeperDie);
 					}
-
 
 				} // end FOR loop
 
@@ -174,31 +228,100 @@ public class ComputerAIController {
 
 					// reduce remaining die count
 					diceRemaining--;
+				}
+
+			}
+
+
+			// HARD DIFFICULTY
+			if (difficulty == 2) {
+
+				int optionsCountOne = 0;
+				int optionsCountTwo = 0;
+				int optionsCountThree = 0;
+				int optionsCountFour = 0;
+				int optionsCountFive = 0;
+				int optionsCountSix = 0;
+
+				int pickedThisTurn = 0;
+
+				int highValue = 0;
+
+				// Look through dice
+				foreach (int dieValue in rolledDieOptions) {
+
+					if (dieValue == 1)
+						optionsCountOne++;
+					if (dieValue == 2)
+						optionsCountTwo++;
+					if (dieValue == 3)
+						optionsCountThree++;
+					if (dieValue == 4)
+						optionsCountFour++;
+					if (dieValue == 5)
+						optionsCountFive++;
+					if (dieValue == 6)
+						optionsCountSix++;
+
+
+
+					if (dieValue > highValue) {
+						highValue = dieValue;
+					}
+					
+
+				}
+
+				// Keep the first 1 seen
+				if (optionsCountOne >= 1 && hasQualifierOne == false) {
+					AIGameResults.Add (1);
+					hasQualifierOne = true;
+					optionsCountOne--;
+					diceRemaining--;
+					pickedThisTurn++;
+				}
+
+				// keep the first 4 seen
+				if (optionsCountFour >= 1 && hasQualifierFour == false) {
+					AIGameResults.Add (4);
+					hasQualifierFour = true;
+					optionsCountFour--;
+					diceRemaining--;
+					pickedThisTurn++;
+				}
+
+				// keep all sixes when qualifiers are met
+				if (hasQualifierOne && hasQualifierFour && optionsCountSix >= 1) {
+
+					int counter = optionsCountSix;
+
+					for (int i = 0; i < counter; i++) {
+						AIGameResults.Add (6);
+						optionsCountSix--;
+						diceRemaining--;
+						pickedThisTurn++;
+					}
+
+
+				} else {
+					// keep the highest value;
+
+					if (diceRemaining > 0 && pickedThisTurn == 0) {
+
+						AIGameResults.Add(highValue);
+						diceRemaining--;
+						pickedThisTurn++;
+
+					}
 
 				}
 
 
-				// roleld Dice string
-				string rdstr = "";
-				foreach (int val in rolledDieOptions) {
-					rdstr = rdstr + ", " + val;
-				}
 
-				// kept dice string
-				string aigr = "";
-				foreach (int val in AIGameResults) {
-					aigr = aigr + ", " + val;
-				}
-
-				//Debug.Log ("Turn[" + turnCounter + "] Complete;  Rolled Dice: [" + rdstr + "]; All Kept Dice [" + aigr + "]");
-
-				// incremenet to next turn
-				turnCounter++;
-
-			} // end while loop
+			}
 
 
-		}
+		} // end while loop
 
 		// does the score qualify?
 		if (hasQualifierOne && hasQualifierFour) {
