@@ -7,13 +7,17 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour {
 
 	// Store the Dice prefabs
-	public GameObject[] dicePrefabs;
+	//public GameObject[] dicePrefabs;
 
 	// Store the faces of the dice to show the values
 	public Sprite[] diceSpriteArray;
 
 	// the prefab rolled dice button
 	public GameObject diceButtonPrefab;
+	public GameObject diceRowContainer;
+
+
+	private GameObject debugTextObject;
 
 	//[SerializeField] private GameObject AIController;
 
@@ -63,6 +67,14 @@ public class GameManager : MonoBehaviour {
 
 	// how many dice did the player select on this turn
 	private int turnDieSelectedCount = 0;
+	public int TurnDieSelectedCount {
+		get {
+			return turnDieSelectedCount;
+		}	
+		set {
+			turnDieSelectedCount = value;
+		}
+	}
 
 	// Track our qualifiers
 	private bool playerHasQualifierOne = false;
@@ -109,8 +121,13 @@ public class GameManager : MonoBehaviour {
 	private void Start ()
 	{
 
+		debugTextObject = GameObject.Find("Debug");
+//		debugTextObject.GetComponent<Text>().text = "1";
+
+
 		// if its a brand new game, make sure we reset all values
 		if (AppController.instance.IsNewGame) {
+//			debugTextObject.GetComponent<Text>().text = "2";
 
 			ResetGameVars();
 
@@ -148,11 +165,8 @@ public class GameManager : MonoBehaviour {
 		ai3.PrintResults();
 
 
-		// Update the UI
-		UpdateGameUIPlayer();
-
 		// Roll the dice!
-		UpdateAllGameUI();
+		//UpdateAllGameUI();
 																																																		
 	}
 
@@ -161,13 +175,14 @@ public class GameManager : MonoBehaviour {
 	public void StartNewTurn ()
 	{  	//Debug.Log("StartNewTurn() Called");
 
+
+//		debugTextObject.GetComponent<Text>().text = "3";
+
 		//Debug.Log ("Turn " + currentTurn + "; DiceRemaining: " + RemainingDiceCount + "; Q1: " + hasQualifierOne + "; Q4: " + hasQualifierFour + "; Score: " + playerScore); 
 
 		// this turn's selected count
 		turnDieSelectedCount = 0;
 
-		// Update our UI
-		UpdateAllGameUI();
 
 		// get rid of all previous playing dice if any
 		if (GameObject.FindObjectsOfType<Die> ().Length > 0) {
@@ -184,12 +199,17 @@ public class GameManager : MonoBehaviour {
 		// Loop through remaining dice and place
 		for (int i = 0; i < remainingDiceCount; i++) {
 
+//			debugTextObject.GetComponent<Text>().text = "4 on iteration [" + i + "]";
+
 			// generate random value
 			int randomResult = Random.Range(0, 6);
 			//Debug.Log("Die [" + i + "] result is [" + randomResult + "]");
+			//debugTextObject.GetComponent<Text>().text = "Randomresult: " + randomResult;
 
-			// create the dice
-			GameObject tmp = Instantiate(diceButtonPrefab, GameObject.FindWithTag("Field").transform) as GameObject;
+			GameObject tmp = Instantiate(diceButtonPrefab, diceRowContainer.transform) as GameObject;
+
+
+//			debugTextObject.GetComponent<Text>().text = "5 on iteration [" + i + "]";
 
 			// rename the gameObjects
 			tmp.name = "DieCastButton_" + i;
@@ -202,45 +222,14 @@ public class GameManager : MonoBehaviour {
 
 		}
 
-	}
-
-
-	// Toggle to keep or re-roll
-	private void SelectDie (GameObject gameObj)
-	{	//Debug.Log ("SelectDie() called.");
-
-
-		// If not highlighted, then...
-		if (gameObj.GetComponent<Die> ().isHighlighted == false) {
-
-			// set highlight flag
-			gameObj.GetComponent<Die> ().isHighlighted = true;
-
-			// add one to turn die keep counter
-			turnDieSelectedCount++;
-
-			// turn it yellow.
-			gameObj.GetComponent<Image> ().color = Color.yellow;
-
-
-		} else if (gameObj.GetComponent<Die> ().isHighlighted == true) {
-
-			// remove highlight flag
-			gameObj.GetComponent<Die> ().isHighlighted = false;
-
-			// turn it back to white.
-			gameObj.GetComponent<Image> ().color = Color.white;
-
-			turnDieSelectedCount--;
-
-		}
-
-		// Update button
-		UpdateSubmitButtonDisplay();
+		// Update our UI
+		UpdateAllGameUI();
 
 	}
 
-	private void UpdateSubmitButtonDisplay()
+
+
+	public void UpdateSubmitButtonDisplay()
 	{
 		// Did they at least select one die
 		if (turnDieSelectedCount > 0) {
@@ -254,8 +243,7 @@ public class GameManager : MonoBehaviour {
 			// add the clicky bit
 			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponent<Button> ().enabled = true;
 			//Debug.Log("selected die count > 0, changing color to " + buttonActiveColor);
-		}
-		else {
+		} else {
 
 			// update text
 			GameObject.FindGameObjectWithTag ("ButtonNextRoll").GetComponentInChildren<Text>().text = "Select Dice";
@@ -357,7 +345,6 @@ public class GameManager : MonoBehaviour {
 	private void UpdateGameUIPlayer ()
 	{	//Debug.Log("UpdateGameUIPlayer() Called");
 
-
 		// Update player score
 		scoreNumberValue.GetComponent<Text> ().text = playerScore.ToString ();
 
@@ -384,26 +371,28 @@ public class GameManager : MonoBehaviour {
 
 		// Player 1 Scored Dice
 		int dieCounter = 1;
-		if (playerRollResults.Count > 0) {
-			foreach (int dieKeptValue in playerRollResults) {
+//		if (playerRollResults.Count > 0) {
+		foreach (int dieKeptValue in playerRollResults) {
 
-				string playerScorePositionTag = "PlayerD" + dieCounter;
+			string playerScorePositionTag = "PlayerD" + dieCounter;
 
-				// player score cant qualify, end game
-				if (dieCounter >= 5 && playerHasQualifierOne == false && playerHasQualifierFour == false) {
+			// player score cant qualify, end game
+			if (dieCounter >= 5 && playerHasQualifierOne == false && playerHasQualifierFour == false) {
 
-					// end game
-					EndGame ();
+				// end game
+				EndGame ();
 
-				} else {
-					// Update the playing field with the die iamges
-					GameObject.FindGameObjectWithTag (playerScorePositionTag).GetComponent<Image> ().sprite = diceSpriteArray [dieKeptValue - 1];
-				}
-
-				dieCounter++;
-
+			} else {
+				// Update the playing field with the die iamges
+				GameObject.FindGameObjectWithTag (playerScorePositionTag).GetComponent<Image> ().sprite = diceSpriteArray [dieKeptValue - 1];
+				debugTextObject.GetComponent<Text>().text = "1";
 			}
+
+			dieCounter++;
+
 		}
+//		}
+
 	}
 
 
@@ -420,16 +409,12 @@ public class GameManager : MonoBehaviour {
 		if (cpuDiceToDisplay > 0) {
 
 			// CPU OPPONENT #1
-
-			// RESET / INIT VARS ===================
 			int[] a1array = ai1Results.ToArray ();
 			int[] a2array = ai2Results.ToArray ();
 			int[] a3array = ai3Results.ToArray ();
 
 			// Which Dice Scoring Position are we filling
 			int scoreDicePosition = 1;
-
-			//bool doNotScoreThisDie = false;
 
 			// Reset ONE qualifier
 			opp1FilledQ1 = false;
@@ -630,6 +615,8 @@ public class GameManager : MonoBehaviour {
 
 		// update CPU section
 		UpdateGameUICPU();
+
+		debugTextObject.GetComponent<Text>().text = "6";
 
 	}
 
