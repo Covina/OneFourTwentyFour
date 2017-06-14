@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour {
 
 	// the prefab rolled dice button
 	public GameObject diceButtonPrefab;
+
+	// Where in the UI the freshly rolled Dice appear
 	public GameObject diceRowContainer;
 
 	// The "Keep" or "Select Dice" button that submits the player's turn
@@ -136,18 +138,6 @@ public class GameManager : MonoBehaviour {
 		debugTextObject = GameObject.Find("Debug");
 //		debugTextObject.GetComponent<Text>().text = "1";
 
-
-//		// if its a brand new game, make sure we reset all values
-//		if (AppController.instance.IsNewGame) {
-//
-//			ResetGameVars();
-//
-//			// game is in session!
-//			AppController.instance.IsNewGame = false;
-//
-//		}
-
-
 		// Generate Computer Opponent 1
 		opp1MasterObject = GameObject.FindWithTag("CPU1");
 		ai1.SetDifficulty(0);
@@ -174,40 +164,30 @@ public class GameManager : MonoBehaviour {
 
 
 		// Start the turn
-		StartNewTurn();
+		PlayTurn();
 
-
-		// Update the UI with Results
-		UpdateAllGameUI();
 																																																		
 	}
 
 
-	public void StartFirstTurn ()
-	{
-
-		// Update our UI
-		UpdateAllGameUI();
-	}
-
 
 	// Start the turn
-	public void StartNewTurn ()
+	public void PlayTurn ()
 	{  	//Debug.Log("StartNewTurn() Called");
 
 
 //		debugTextObject.GetComponent<Text>().text = "3";
 
-		Debug.Log ("Turn " + currentTurn + "; DiceRemaining: " + RemainingDiceCount + "; PQ1: " + playerHasQualifierOne + "; PQ4: " + playerHasQualifierFour + "; Score: " + playerScore); 
+		//Debug.Log ("Turn " + currentTurn + "; DiceRemaining: " + RemainingDiceCount + "; PQ1: " + playerHasQualifierOne + "; PQ4: " + playerHasQualifierFour + "; Score: " + playerScore); 
 
 		// this turn's selected count
 		turnDieSelectedCount = 0;
 
-
 		// get rid of all previous playing dice if any exist in view
-		if (GameObject.FindObjectsOfType<Die> ().Length > 0) {
+		Die[] diceOnDisplay = GameObject.FindObjectsOfType<Die>();
+		if (diceOnDisplay.Length > 0) {
 
-			foreach (Die obj in GameObject.FindObjectsOfType<Die>()) {
+			foreach (Die obj in diceOnDisplay) {
 
 				Destroy (obj.gameObject);
 
@@ -227,6 +207,7 @@ public class GameManager : MonoBehaviour {
 			int randomResult = Random.Range(0, 6);
 			//Debug.Log("Die [" + i + "] result is [" + randomResult + "]");
 
+			// create the die
 			GameObject tmp = Instantiate(diceButtonPrefab, diceRowContainer.transform) as GameObject;
 
 			// rename the GameObject
@@ -281,14 +262,12 @@ public class GameManager : MonoBehaviour {
 			//Debug.Log("selected die count == 0, changing color to Color.gray");
 		}
 
-
 	}
 
 
 	// Process Turn
 	private void SubmitTurn ()
 	{
-
 
 		debugTextObject.GetComponent<Text>().text = "2 - SubmitTurn()";
 
@@ -334,7 +313,7 @@ public class GameManager : MonoBehaviour {
 		} 
 
 		// Has their Score Qualfied qualified?
-		if (playerHasQualifierOne == true && playerHasQualifierFour == true) {
+		if (AppController.instance.IsPlayerScoreQualified == false && playerHasQualifierOne == true && playerHasQualifierFour == true) {
 			// score has qualified
 			AppController.instance.IsPlayerScoreQualified = true;
 		}
@@ -348,11 +327,11 @@ public class GameManager : MonoBehaviour {
 
 		} else {
 
+			// Update the UI after submitting the turn.
 			UpdateAllGameUI();
 
-
 			// game not over, start next round
-			StartNewTurn ();
+			PlayTurn ();
 
 		}
 
@@ -364,18 +343,18 @@ public class GameManager : MonoBehaviour {
 	private void UpdateGameUIPlayer ()
 	{	//Debug.Log("UpdateGameUIPlayer() Called");
 
-		// Update player score
+		// PLAYER SCORE
 		playerScoreNumberValue.GetComponent<Text> ().text = playerScore.ToString ();
 
 
-		// Do they have the One qualifier
+		// QUALIFIER ONE
 		if (playerHasQualifierOne == true) {
 
 			// Update the Sprite from Green to Dice
 			GameObject.FindGameObjectWithTag ("PlayerQ1").GetComponent<Image> ().sprite = diceSpriteArray [0];
 		}
 
-		// Do they have the Four qualifier
+		// QUALIFIER FOUR
 		if (playerHasQualifierFour == true) {
 
 			// Update the Sprite from Green to Dice
@@ -383,29 +362,22 @@ public class GameManager : MonoBehaviour {
 
 		} 
 
-		// Loop through stored Player dice and update the UI
-
-		// Player 1 Scored Dice
+		// PLAYER HAND DICE
 		int dieCounter = 1;
 
 		foreach (int dieKeptValue in playerRollResults) {
 
+			// GameObject Location
 			string playerScorePositionTag = "PlayerD" + dieCounter;
 
-			// player score cant qualify, end game
-			if (dieCounter >= 5 && playerHasQualifierOne == false && playerHasQualifierFour == false) {
+			// Update the playing field with the die iamges
+			int tmp1 = dieKeptValue - 1;
 
-				// end game
-				EndGame ();
+			GameObject.FindGameObjectWithTag (playerScorePositionTag).GetComponent<Image> ().sprite = diceSpriteArray [tmp1];
 
-			} else {
+			//Debug.Log("Updating playerScorePositionTag [" + playerScorePositionTag + "] with diceSpriteArray[" + tmp1 + "]");
 
-				// Update the playing field with the die iamges
-				int tmp1 = dieKeptValue - 1;
-				GameObject.FindGameObjectWithTag (playerScorePositionTag).GetComponent<Image> ().sprite = diceSpriteArray [tmp1];
-				//Debug.Log("Updating playerScorePositionTag [" + playerScorePositionTag + "] with diceSpriteArray[" + tmp1 + "]");
-
-			}
+			debugTextObject.GetComponent<Text>().text = "UpdateGameUIPlayer()";
 
 			dieCounter++;
 
@@ -413,8 +385,6 @@ public class GameManager : MonoBehaviour {
 
 
 	}
-
-
 
 
 
@@ -510,7 +480,6 @@ public class GameManager : MonoBehaviour {
 
 			}
 
-			// Update results for Computer Player 2
 
 			// **************************************
 			// Update results for Computer Player 2
