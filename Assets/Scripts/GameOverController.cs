@@ -21,14 +21,14 @@ public class GameOverController : MonoBehaviour {
 	{
 
 		// Update Player Score
-		if (AppController.instance.PlayerScoreQualifies) {
+		if (AppController.instance.IsPlayerScoreQualified == true) {
 			finalScoreValue.GetComponent<Text> ().text = AppController.instance.PlayerFinalScore.ToString ();
 		} else {
 			finalScoreValue.GetComponent<Text> ().text = "Disqualified";
 		}
 
 		// Update CPU1
-		if (AppController.instance.CPU1ScoreQualifies) {
+		if (AppController.instance.IsCPU1ScoreQualified == true) {
 			cpu1FinalScore.GetComponent<Text> ().text = AppController.instance.CPU1FinalScore.ToString ();
 		} else {
 			cpu1FinalScore.GetComponent<Text> ().text = "DQ";
@@ -36,7 +36,7 @@ public class GameOverController : MonoBehaviour {
 		}
 
 		// Update CPU2
-		if (AppController.instance.CPU2ScoreQualifies) {
+		if (AppController.instance.IsCPU2ScoreQualified == true) {
 			cpu2FinalScore.GetComponent<Text> ().text = AppController.instance.CPU2FinalScore.ToString ();
 		} else {
 			cpu2FinalScore.GetComponent<Text> ().text = "DQ";
@@ -44,7 +44,7 @@ public class GameOverController : MonoBehaviour {
 		}
 
 		// Update CPU3
-		if (AppController.instance.CPU3ScoreQualifies) {
+		if (AppController.instance.IsCPU3ScoreQualified == true) {
 			cpu3FinalScore.GetComponent<Text> ().text = AppController.instance.CPU3FinalScore.ToString ();
 		} else {
 			cpu3FinalScore.GetComponent<Text> ().text = "DQ";
@@ -62,7 +62,7 @@ public class GameOverController : MonoBehaviour {
 		// 2 = win
 		int outcome = 0;
 
-		if (AppController.instance.PlayerScoreQualifies) {
+		if (AppController.instance.IsPlayerScoreQualified) {
 
 			foreach (int opponentScore in allResults) {
 

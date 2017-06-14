@@ -12,7 +12,15 @@ public class Die : MonoBehaviour {
 
 	public int dieValue;
 
-	[SerializeField] private GameManager gameManager;
+	private GameManager gameManager;
+
+
+	void Start ()
+	{
+		// get access to the object
+		gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+
+	}
 
 
 	// Toggle to keep or re-roll

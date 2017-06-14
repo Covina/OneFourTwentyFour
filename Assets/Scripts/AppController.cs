@@ -29,13 +29,13 @@ public class AppController : MonoBehaviour {
 	}
 
 	// Does the player's score qualify
-	private bool playerScoreQualifies = false;
-	public bool PlayerScoreQualifies {
+	private bool isPlayerScoreQualified = false;
+	public bool IsPlayerScoreQualified {
 		get {
-			return playerScoreQualifies;
+			return isPlayerScoreQualified;
 		}	
 		set {
-			playerScoreQualifies = value;
+			isPlayerScoreQualified = value;
 		}
 	}
 
@@ -52,13 +52,13 @@ public class AppController : MonoBehaviour {
 	}
 
 	// Does CPU1 score qualify
-	private bool cpu1ScoreQualifies = false;
-	public bool CPU1ScoreQualifies {
+	private bool isCPU1ScoreQualified = false;
+	public bool IsCPU1ScoreQualified {
 		get {
-			return cpu1ScoreQualifies;
+			return isCPU1ScoreQualified;
 		}	
 		set {
-			cpu1ScoreQualifies = value;
+			isCPU1ScoreQualified = value;
 		}
 	}
 
@@ -76,13 +76,13 @@ public class AppController : MonoBehaviour {
 
 
 	// Does CPU2 score qualify
-	private bool cpu2ScoreQualifies = false;
-	public bool CPU2ScoreQualifies {
+	private bool isCPU2ScoreQualified = false;
+	public bool IsCPU2ScoreQualified {
 		get {
-			return cpu2ScoreQualifies;
+			return isCPU2ScoreQualified;
 		}	
 		set {
-			cpu2ScoreQualifies = value;
+			isCPU2ScoreQualified = value;
 		}
 	}
 
@@ -99,13 +99,13 @@ public class AppController : MonoBehaviour {
 	}
 
 	// Does CPU1 score qualify
-	private bool cpu3ScoreQualifies = false;
-	public bool CPU3ScoreQualifies {
+	private bool isCPU3ScoreQualified = false;
+	public bool IsCPU3ScoreQualified {
 		get {
-			return cpu3ScoreQualifies;
+			return isCPU3ScoreQualified;
 		}	
 		set {
-			cpu3ScoreQualifies = value;
+			isCPU3ScoreQualified = value;
 		}
 	}
 
