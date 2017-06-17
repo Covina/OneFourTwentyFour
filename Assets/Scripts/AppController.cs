@@ -148,6 +148,8 @@ public class AppController : MonoBehaviour {
 
 		DontDestroyOnLoad(instance);
 
+		//Debug.Log("Game Launched");
+
 	}
 
 	// Load Scene Navigation
@@ -169,6 +171,8 @@ public class AppController : MonoBehaviour {
 		PlayerPrefs.SetInt ("Sound", tmp);
 
 	}
+
+
 
 
 

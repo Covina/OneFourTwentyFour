@@ -25,18 +25,13 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] private GameObject playerScoreNumberValue;
 
 
-
 	// PLAYER
 	// The dice roll results for the Player
-	private List<int> playerRollResults = new List<int>();
+	private List<int> playerHand = new List<int>();
 
 	// Track our qualifiers
 	private bool playerHasQualifierOne = false;
 	private bool playerHasQualifierFour = false;
-
-	// store player score during the game
-	private int playerScore = 0;
-
 
 
 	// Opponent 1
@@ -104,6 +99,8 @@ public class GameManager : MonoBehaviour {
 	// Deactive Keep button color
 	private Color buttonDisabledColor = Color.gray;
 
+	// store player score during the game
+	private int playerScore = 0;
 
 	// how many dice did the player select on this turn
 	private int turnDieSelectedCount = 0;
@@ -175,17 +172,22 @@ public class GameManager : MonoBehaviour {
 	public void PlayTurn ()
 	{  	//Debug.Log("StartNewTurn() Called");
 
+		Debug.Log ("PlayTurn()::currentTurn " + currentTurn + "; RemainingDiceCount: " + RemainingDiceCount + "; PQ1: " + playerHasQualifierOne + "; PQ4: " + playerHasQualifierFour + "; playerScore: " + playerScore); 
+		//DebugText("**Turn[" + currentTurn + "];DiceRemaining[" + RemainingDiceCount + "];PQ1[" + playerHasQualifierOne + "];PQ4[" + playerHasQualifierFour + "];Score[" + playerScore + "]**");
 
-//		debugTextObject.GetComponent<Text>().text = "3";
-
-		//Debug.Log ("Turn " + currentTurn + "; DiceRemaining: " + RemainingDiceCount + "; PQ1: " + playerHasQualifierOne + "; PQ4: " + playerHasQualifierFour + "; Score: " + playerScore); 
 
 		// this turn's selected count
 		turnDieSelectedCount = 0;
 
 		// get rid of all previous playing dice if any exist in view
 		Die[] diceOnDisplay = GameObject.FindObjectsOfType<Die>();
+
+
+		Debug.Log("PlayTurn ()::diceOnDisplay.Length " + diceOnDisplay.Length);
+	
 		if (diceOnDisplay.Length > 0) {
+
+			//DebugText("PlayTurn():DiceFound[" + diceOnDisplay.Length + "]");
 
 			foreach (Die obj in diceOnDisplay) {
 
@@ -222,6 +224,9 @@ public class GameManager : MonoBehaviour {
 		}
 
 
+		UpdateAllGameUI ();
+
+
 	}
 
 
@@ -229,7 +234,7 @@ public class GameManager : MonoBehaviour {
 
 	// Toggle the Keep or Select Dice button
 	public void UpdateSubmitButtonDisplay()
-	{
+	{	// Debug.Log("UpdateSubmitButtonDisplay() called");
 		//debugTextObject.GetComponent<Text>().text = "1a UpSubButtDisp Value [" + turnDieSelectedCount + "]";
 
 		// Did they at least select one die
@@ -266,10 +271,11 @@ public class GameManager : MonoBehaviour {
 
 
 	// Process Turn
-	private void SubmitTurn ()
+	public void SubmitTurn ()
 	{
 
-		debugTextObject.GetComponent<Text>().text = "2 - SubmitTurn()";
+		//DebugText("SubmitTurn()");
+		Debug.Log("SubmitTurn() Called");
 
 		// Get the dice on the board
 		Die[] gameboard = GameObject.FindObjectsOfType<Die> ();
@@ -277,12 +283,14 @@ public class GameManager : MonoBehaviour {
 		// did they highlight at least one?
 		if (gameboard.Length > 0) {
 
+			//DebugText("NbrDicePicked[" + gameboard.Length + "]");
+			Debug.Log("SubmitTurn()::gameboard.Length[" + gameboard.Length + "]");
+
 			// loop through
 			foreach (Die gob in gameboard) {
 
 				// if its highlighted, count it.
 				if (gob.isHighlighted) {
-
 
 					if (gob.dieValue == 1 && playerHasQualifierOne == false) {
 
@@ -295,26 +303,30 @@ public class GameManager : MonoBehaviour {
 
 					} else {
 
-						// Store it and Score it
-						playerRollResults.Add(gob.dieValue);
+						// Store it
+						playerHand.Add(gob.dieValue);
 
+						// Score it
 						playerScore += gob.dieValue;
 
 					}
 
-					// Increment the turn counter, one for each die
+					// Increment the turn counter, one for each highlighted die
 					currentTurn++;
-					Debug.Log("Kept dieVal[" + gob.dieValue + "]; currentTurn[" + currentTurn + "]"); 
 
+					Debug.Log("SubmitTurn()::Kept gob.dieValue[" + gob.dieValue + "]; currentTurn[" + currentTurn + "]"); 
+					//DebugText("2b-SubmitTurn(),currentTurn[" + currentTurn + "]");
 				}
 
 			}
 
 		} 
 
+
 		// Has their Score Qualfied qualified?
 		if (AppController.instance.IsPlayerScoreQualified == false && playerHasQualifierOne == true && playerHasQualifierFour == true) {
-			// score has qualified
+
+			// Update Player score has qualified
 			AppController.instance.IsPlayerScoreQualified = true;
 		}
 
@@ -365,7 +377,7 @@ public class GameManager : MonoBehaviour {
 		// PLAYER HAND DICE
 		int dieCounter = 1;
 
-		foreach (int dieKeptValue in playerRollResults) {
+		foreach (int dieKeptValue in playerHand) {
 
 			// GameObject Location
 			string playerScorePositionTag = "PlayerD" + dieCounter;
@@ -375,9 +387,9 @@ public class GameManager : MonoBehaviour {
 
 			GameObject.FindGameObjectWithTag (playerScorePositionTag).GetComponent<Image> ().sprite = diceSpriteArray [tmp1];
 
-			//Debug.Log("Updating playerScorePositionTag [" + playerScorePositionTag + "] with diceSpriteArray[" + tmp1 + "]");
+			Debug.Log("UpdateGameUIPlayer()::playerScorePositionTag [" + playerScorePositionTag + "] with diceSpriteArray[" + tmp1 + "]");
 
-			debugTextObject.GetComponent<Text>().text = "UpdateGameUIPlayer()";
+			//DebugText("UpdateGameUIPlayer()");
 
 			dieCounter++;
 
@@ -392,12 +404,12 @@ public class GameManager : MonoBehaviour {
 	{	//Debug.Log("UpdateGameUICPU() Called");
 		
 		// derive how many CPU results to show
-		int cpuDiceToDisplay = currentTurn;
+		// int currentTurn = currentTurn;
 
-		//Debug.Log ("AI to display dice amount: " + cpuDiceToDisplay);
+		Debug.Log ("UpdateGameUICPU()::currentTurn[" + currentTurn + "]");
 
 		// if its more than zero, show CPU results
-		if (cpuDiceToDisplay > 0) {
+		if (currentTurn > 0) {
 
 			// CPU OPPONENT #1
 			int[] a1array = ai1Results.ToArray ();
@@ -426,7 +438,7 @@ public class GameManager : MonoBehaviour {
 
 			// **************************************
 			// Update results for Computer Player 1
-			for (int i = 0; i < cpuDiceToDisplay; i++) {
+			for (int i = 0; i < currentTurn; i++) {
 
 				// convenience:  store the face value of the die
 				int diceFaceValue = a1array [i];
@@ -486,7 +498,7 @@ public class GameManager : MonoBehaviour {
 
 			scoreDicePosition = 1;
 
-			for (int i = 0; i < cpuDiceToDisplay; i++) {
+			for (int i = 0; i < currentTurn; i++) {
 
 				// convenience:  store the face value of the die
 
@@ -545,7 +557,7 @@ public class GameManager : MonoBehaviour {
 			// Update results for Computer Player 2
 
 			scoreDicePosition = 1;
-			for (int i = 0; i < cpuDiceToDisplay; i++) {
+			for (int i = 0; i < currentTurn; i++) {
 
 				// convenience:  store the face value of the die
 
@@ -607,7 +619,7 @@ public class GameManager : MonoBehaviour {
 
 	// Update all the UI
 	private void UpdateAllGameUI ()
-	{	//Debug.Log("UpdateAllGameUI() Called");
+	{	Debug.Log("UpdateAllGameUI() Called");
 
 		// update player section
 		UpdateGameUIPlayer();
@@ -615,14 +627,16 @@ public class GameManager : MonoBehaviour {
 		// update CPU section
 		UpdateGameUICPU();
 
-		debugTextObject.GetComponent<Text>().text = "6 - UpdateAllGameUI ()";
+		//DebugText("6-UpdateAllGameUI()");
 
 	}
 
 
 	// the Game is Over
 	public void EndGame() 
-	{	//Debug.Log ("EndGame() Called");
+	{	Debug.Log ("EndGame() Called");
+
+		// DebugText ("EndGame()");
 
 		// Store the final score of the player
 		AppController.instance.PlayerFinalScore = playerScore;
@@ -651,6 +665,13 @@ public class GameManager : MonoBehaviour {
 //
 //	}
 
+//	// help me find bugs!
+//	public void DebugText (string str)
+//	{
+//
+//		debugTextObject.GetComponent<Text>().text += "||" + str;
+//
+//	}
 
 
 }
