@@ -132,6 +132,9 @@ public class GameManager : MonoBehaviour {
 	private void Start ()
 	{
 
+		// display the ad
+		AdManager.instance.ShowBanner();
+
 		debugTextObject = GameObject.Find("Debug");
 //		debugTextObject.GetComponent<Text>().text = "1";
 
@@ -634,9 +637,7 @@ public class GameManager : MonoBehaviour {
 
 	// the Game is Over
 	public void EndGame() 
-	{	Debug.Log ("EndGame() Called");
-
-		// DebugText ("EndGame()");
+	{	//Debug.Log ("EndGame() Called");
 
 		// Store the final score of the player
 		AppController.instance.PlayerFinalScore = playerScore;
