@@ -116,6 +116,10 @@ public class GameOverController : MonoBehaviour {
 	public void RestartGame ()
 	{
 
+
+		// Display an interstitial
+		AdManager.instance.ShowVideo();
+
 		// reload the game scene
 		AppController.instance.LoadScene("Game");
 

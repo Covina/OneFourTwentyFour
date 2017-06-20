@@ -44,9 +44,14 @@ public class AdManager : MonoBehaviour {
 		// initialize Admob ads
 		Admob.Instance().initAdmob(bannerId, videoId);
 
+		// Turn testing on
+		//Admob.Instance().setTesting(true);
+
 		// preload the video interstitial
 		Admob.Instance().loadInterstitial();
 		#endif	
+
+
 
 	}
 
